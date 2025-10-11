@@ -61,7 +61,6 @@ namespace Birlik_Mobile.Services
                     };
                 }
 
-                // ✅ Si todo va bien, deserializamos la respuesta
                 var data = await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
                 LastError = null;
 
@@ -74,7 +73,6 @@ namespace Birlik_Mobile.Services
             }
             catch (Exception ex)
             {
-                // ⚠️ Captura de excepciones del cliente
                 LastError = ex.Message;
                 Console.WriteLine($"💥 Excepción en LoginAsync: {ex.Message}");
                 return new ApiResult<LoginResponseDTO>

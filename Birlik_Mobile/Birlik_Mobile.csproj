@@ -83,4 +83,8 @@
       </AndroidResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\resources\img\" />
+    </ItemGroup>
+
 </Project>
