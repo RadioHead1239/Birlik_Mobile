@@ -1,31 +1,681 @@
 ﻿@page "/cliente/polizas"
 @inject NavigationManager Nav
+@inject Birlik_Mobile.Services.AuthService AuthService
 
 <RoleGuard AllowedRole="Cliente">
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="text-primary mb-0">
-                <i class="bi bi-shield-check me-2"></i> Mis Pólizas
-            </h4>
-            <button class="btn btn-outline-secondary btn-sm" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
-                <i class="bi bi-arrow-left"></i> Volver
+    <div class="polizas-container">
+        <!-- Header -->
+        <div class="page-header">
+            <button class="back-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
+                <i class="bi bi-arrow-left"></i>
             </button>
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Mis Pólizas
+                </h1>
+                <p class="page-subtitle">Gestiona todos tus seguros</p>
+            </div>
         </div>
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <p>Aquí se listarán todas tus pólizas activas y vencidas.</p>
-
-                <div class="list-group">
-                    <div class="list-group-item">
-                        <h6 class="fw-bold">Póliza N° 001245</h6>
-                        <p class="mb-1 text-muted">Ramo: Vehicular | Vigencia: 01/01/2025 - 31/12/2025</p>
-                        <button class="btn btn-primary btn-sm">
-                            <i class="bi bi-eye me-1"></i> Ver detalle
-                        </button>
-                    </div>
+        <!-- Resumen de pólizas -->
+        <div class="polizas-summary">
+            <div class="summary-card">
+                <div class="summary-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>3</h3>
+                    <p>Pólizas Activas</p>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon warning">
+                    <i class="bi bi-calendar-exclamation"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>2</h3>
+                    <p>Próximas a Vencer</p>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon success">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>5</h3>
+                    <p>Total de Pólizas</p>
                 </div>
             </div>
         </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+            <div class="filter-tabs">
+                <button class="filter-tab @(filtroActivo == "todas" ? "active" : "")" 
+                        @onclick="@(() => CambiarFiltro("todas"))">
+                    Todas
+                </button>
+                <button class="filter-tab @(filtroActivo == "activas" ? "active" : "")" 
+                        @onclick="@(() => CambiarFiltro("activas"))">
+                    Activas
+                </button>
+                <button class="filter-tab @(filtroActivo == "vencidas" ? "active" : "")" 
+                        @onclick="@(() => CambiarFiltro("vencidas"))">
+                    Vencidas
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de pólizas -->
+        <div class="polizas-list">
+            @foreach (var poliza in ObtenerPolizasFiltradas())
+            {
+                <div class="poliza-card @poliza.Estado.ToLower()">
+                    <div class="poliza-header">
+                        <div class="poliza-info">
+                            <h4 class="poliza-numero">Póliza #@poliza.Numero</h4>
+                            <span class="poliza-ramo">@poliza.Ramo</span>
+                        </div>
+                        <div class="poliza-status">
+                            <span class="status-badge @poliza.Estado.ToLower()">
+                                @poliza.Estado
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="poliza-details">
+                        <div class="detail-row">
+                            <i class="bi bi-calendar3"></i>
+                            <span>Vigencia: @poliza.FechaInicio.ToString("dd/MM/yyyy") - @poliza.FechaFin.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="bi bi-currency-dollar"></i>
+                            <span>Prima: @poliza.Prima.ToString("C")</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="bi bi-building"></i>
+                            <span>Aseguradora: @poliza.Aseguradora</span>
+                        </div>
+                    </div>
+
+                    <div class="poliza-actions">
+                        <button class="action-btn primary" @onclick="@(() => VerDetalle(poliza))">
+                            <i class="bi bi-eye"></i>
+                            Ver Detalle
+                        </button>
+                        <button class="action-btn secondary" @onclick="@(() => DescargarPoliza(poliza))">
+                            <i class="bi bi-download"></i>
+                            Descargar
+                        </button>
+                        @if (poliza.Estado == "Activa" && poliza.DiasParaVencer <= 30)
+                        {
+                            <button class="action-btn warning" @onclick="@(() => RenovarPoliza(poliza))">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Renovar
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Mensaje cuando no hay pólizas -->
+        @if (!ObtenerPolizasFiltradas().Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-shield"></i>
+                </div>
+                <h3>No hay pólizas</h3>
+                <p>No se encontraron pólizas con el filtro seleccionado.</p>
+                <button class="btn btn-primary" @onclick="@(() => CambiarFiltro("todas"))">
+                    Ver todas las pólizas
+                </button>
+            </div>
+        }
+
+        <!-- Acciones rápidas -->
+        <div class="quick-actions-section">
+            <h4>
+                <i class="bi bi-lightning me-2"></i>
+                Acciones Rápidas
+            </h4>
+            <div class="quick-actions">
+                <button class="quick-action-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
+                    <i class="bi bi-house"></i>
+                    <span>Inicio</span>
+                </button>
+                <button class="quick-action-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/facturas"))">
+                    <i class="bi bi-receipt"></i>
+                    <span>Facturas</span>
+                </button>
+                <button class="quick-action-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
+                    <i class="bi bi-telephone"></i>
+                    <span>Emergencia</span>
+                </button>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert @GetAlertClass()">
+                <i class="bi @GetAlertIcon() me-2"></i>
+                @mensaje
+            </div>
+        }
     </div>
 </RoleGuard>
+
+<style>
+.polizas-container {
+    padding: 1rem;
+    background: var(--light-bg);
+    min-height: 100vh;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.back-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.back-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.header-content {
+    flex: 1;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.page-subtitle {
+    color: #6b7280;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.polizas-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.summary-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.summary-icon.warning {
+    background: var(--warning-color);
+}
+
+.summary-icon.success {
+    background: var(--success-color);
+}
+
+.summary-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #1f2937;
+}
+
+.summary-content p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.filters-section {
+    margin-bottom: 2rem;
+}
+
+.filter-tabs {
+    display: flex;
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    box-shadow: var(--card-shadow);
+    gap: 0.5rem;
+}
+
+.filter-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.filter-tab.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.filter-tab:hover:not(.active) {
+    background: #f3f4f6;
+}
+
+.polizas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.poliza-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.2s;
+}
+
+.poliza-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.poliza-card.activa {
+    border-left-color: var(--success-color);
+}
+
+.poliza-card.vencida {
+    border-left-color: var(--danger-color);
+}
+
+.poliza-card.proxima-vencer {
+    border-left-color: var(--warning-color);
+}
+
+.poliza-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.poliza-numero {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: #1f2937;
+}
+
+.poliza-ramo {
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.activa {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+}
+
+.status-badge.vencida {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+}
+
+.status-badge.proxima-vencer {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+}
+
+.poliza-details {
+    margin-bottom: 1.5rem;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.detail-row i {
+    width: 16px;
+    color: var(--primary-color);
+}
+
+.poliza-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.action-btn.primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.action-btn.primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.action-btn.secondary {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.action-btn.secondary:hover {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.action-btn.warning {
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+}
+
+.action-btn.warning:hover {
+    background: var(--warning-color);
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #9ca3af;
+    margin-bottom: 2rem;
+}
+
+.quick-actions-section {
+    margin-bottom: 2rem;
+}
+
+.quick-actions-section h4 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-around;
+}
+
+.quick-action-btn {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 80px;
+}
+
+.quick-action-btn:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.quick-action-btn i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.quick-action-btn span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .polizas-container {
+        padding: 0.75rem;
+    }
+    
+    .polizas-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-card {
+        padding: 1rem;
+    }
+    
+    .poliza-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .poliza-actions {
+        justify-content: center;
+    }
+    
+    .action-btn {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .quick-actions {
+        gap: 0.5rem;
+    }
+    
+    .quick-action-btn {
+        padding: 0.75rem 0.5rem;
+        min-width: 70px;
+    }
+}
+</style>
+
+@code {
+    private string filtroActivo = "todas";
+    private string mensaje = string.Empty;
+
+    private List<PolizaModel> polizas = new()
+    {
+        new PolizaModel
+        {
+            Numero = "001245",
+            Ramo = "Vehicular",
+            Estado = "Activa",
+            FechaInicio = new DateTime(2024, 1, 1),
+            FechaFin = new DateTime(2025, 12, 31),
+            Prima = 1200.00m,
+            Aseguradora = "Seguros Birlik",
+            DiasParaVencer = 45
+        },
+        new PolizaModel
+        {
+            Numero = "001246",
+            Ramo = "Vida",
+            Estado = "Activa",
+            FechaInicio = new DateTime(2024, 6, 1),
+            FechaFin = new DateTime(2025, 5, 31),
+            Prima = 800.00m,
+            Aseguradora = "Seguros Birlik",
+            DiasParaVencer = 15
+        },
+        new PolizaModel
+        {
+            Numero = "001247",
+            Ramo = "Hogar",
+            Estado = "Proxima Vencimiento",
+            FechaInicio = new DateTime(2023, 1, 1),
+            FechaFin = new DateTime(2024, 12, 31),
+            Prima = 600.00m,
+            Aseguradora = "Seguros Birlik",
+            DiasParaVencer = 5
+        },
+        new PolizaModel
+        {
+            Numero = "001248",
+            Ramo = "Salud",
+            Estado = "Vencida",
+            FechaInicio = new DateTime(2023, 1, 1),
+            FechaFin = new DateTime(2024, 12, 31),
+            Prima = 900.00m,
+            Aseguradora = "Seguros Birlik",
+            DiasParaVencer = -10
+        }
+    };
+
+    private class PolizaModel
+    {
+        public string Numero { get; set; } = string.Empty;
+        public string Ramo { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
+        public decimal Prima { get; set; }
+        public string Aseguradora { get; set; } = string.Empty;
+        public int DiasParaVencer { get; set; }
+    }
+
+    private List<PolizaModel> ObtenerPolizasFiltradas()
+    {
+        return filtroActivo switch
+        {
+            "activas" => polizas.Where(p => p.Estado == "Activa").ToList(),
+            "vencidas" => polizas.Where(p => p.Estado == "Vencida").ToList(),
+            _ => polizas.ToList()
+        };
+    }
+
+    private void CambiarFiltro(string filtro)
+    {
+        filtroActivo = filtro;
+    }
+
+    private void VerDetalle(PolizaModel poliza)
+    {
+        mensaje = $"Abriendo detalles de la póliza #{poliza.Numero}...";
+        // Aquí podrías navegar a una página de detalle o mostrar un modal
+    }
+
+    private void DescargarPoliza(PolizaModel poliza)
+    {
+        mensaje = $"Descargando póliza #{poliza.Numero}...";
+        // Aquí podrías implementar la descarga del PDF
+    }
+
+    private void RenovarPoliza(PolizaModel poliza)
+    {
+        mensaje = $"Iniciando renovación de la póliza #{poliza.Numero}...";
+        // Aquí podrías navegar al proceso de renovación
+    }
+
+    private string GetAlertClass()
+    {
+        if (mensaje.Contains("Descargando") || mensaje.Contains("renovación"))
+            return "alert-success";
+        else if (mensaje.Contains("Error"))
+            return "alert-danger";
+        else
+            return "alert-info";
+    }
+
+    private string GetAlertIcon()
+    {
+        if (mensaje.Contains("Descargando") || mensaje.Contains("renovación"))
+            return "bi-check-circle";
+        else if (mensaje.Contains("Error"))
+            return "bi-exclamation-triangle";
+        else
+            return "bi-info-circle";
+    }
+}

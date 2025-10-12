@@ -3,68 +3,135 @@
 @inject Birlik_Mobile.Services.AuthService AuthService
 @inject NavigationManager NavManager
 
-<div class="d-flex flex-column justify-content-center align-items-center vh-100 bg-light">
-    <div class="card shadow p-4" style="width: 320px; border-radius: 12px;">
-        <div class="text-center mb-3">
-            <img src="https://plataformabirlik.azurewebsites.net/Theme/Front-v2-1/dist/assets/imagen/presentacion/logobi_n.svg" alt="Logo Corredor" width="300" />
-            <small class="text-muted">Iniciar sesión</small>
+<div class="login-container">
+    <!-- Header con logo -->
+    <div class="login-header">
+        <div class="logo-container">
+            <img src="https://plataformabirlik.azurewebsites.net/Theme/Front-v2-1/dist/assets/imagen/presentacion/logobi_n.svg" 
+                 alt="Birlik Corredor de Seguros"  
+                 class="logo" />
         </div>
-
-        <div class="form-group mb-3">
-            <input type="text"
-                   class="form-control"
-                   placeholder="Usuario"
-                   @bind="usuario"
-                   @bind:event="oninput" />
-        </div>
-
-        <div class="form-group mb-3">
-            <input type="password"
-                   class="form-control"
-                   placeholder="Contraseña"
-                   @bind="password"
-                   @bind:event="oninput" />
-        </div>
-
-        <button class="btn btn-primary w-100" @onclick="IniciarSesion" disabled="@isLoading">
-            @if (isLoading)
-            {
-                <span class="spinner-border spinner-border-sm me-2"></span>
-                <span>Verificando...</span>
-            }
-            else
-            {
-                <span>Ingresar</span>
-            }
-        </button>
-
-        @if (!string.IsNullOrEmpty(mensaje))
-        {
-            <div class="alert alert-info mt-3 text-center p-2">@mensaje</div>
-        }
     </div>
 
-    <footer class="text-muted mt-4" style="font-size: 0.8rem;">
-        © @DateTime.Now.Year Corredor de Seguros - Todos los derechos reservados
+    <!-- Formulario de login -->
+    <div class="login-form-container fade-in">
+        <div class="login-card">
+            <div class="card-header">
+                <h3 class="text-white mb-0">
+                    <i class="bi bi-shield-lock me-2"></i>
+                    Iniciar Sesión
+                </h3>
+                <p class="text-white-50 mb-0 mt-2">Accede a tu cuenta para continuar</p>
+            </div>
+            
+            <div class="card-body">
+                <form @onsubmit="IniciarSesion" @onsubmit:preventDefault="true">
+                    <div class="form-floating mb-3">
+                        <input type="text" 
+                               class="form-control @(hasError ? "is-invalid" : "")" 
+                               id="usuario"
+                               placeholder="Usuario"
+                               @bind="usuario"
+                               @bind:event="oninput"
+                               required />
+                        <label for="usuario">
+                            <i class="bi bi-person me-1"></i>Usuario
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="password" 
+                               class="form-control @(hasError ? "is-invalid" : "")" 
+                               id="password"
+                               placeholder="Contraseña"
+                               @bind="password"
+                               @bind:event="oninput"
+                               required />
+                        <label for="password">
+                            <i class="bi bi-lock me-1"></i>Contraseña
+                        </label>
+                    </div>
+
+                    <button type="submit" 
+                            class="btn btn-primary w-100 btn-lg" 
+                            disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="loading me-2"></span>
+                            <span>Verificando credenciales...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            <span>Ingresar</span>
+                        }
+                    </button>
+                </form>
+
+                @if (!string.IsNullOrEmpty(mensaje))
+                {
+                    <div class="alert @GetAlertClass() mt-3 text-center">
+                        <i class="bi @GetAlertIcon() me-2"></i>
+                        @mensaje
+                    </div>
+                }
+
+                <!-- Información adicional -->
+                <div class="login-info mt-4">
+                    <p class="text-muted small text-center">
+                        <i class="bi bi-info-circle me-1"></i>
+                        ¿Problemas para acceder? Contacta a soporte técnico
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+        <p class="text-center text-white-50">
+            © @DateTime.Now.Year Birlik Corredor de Seguros
+        </p>
+        <p class="text-center text-white-50 small">
+            Todos los derechos reservados
+        </p>
     </footer>
 
+    <!-- Debug info (solo en desarrollo) -->
     @if (showDebug)
     {
-        <div class="mt-4 w-100" style="max-width: 640px;">
-            <div class="card border-0 shadow-sm">
+        <div class="debug-container">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-bug me-2"></i>
+                        Información de Depuración
+                    </h6>
+                </div>
                 <div class="card-body">
-                    <p class="mb-1"><b>URL llamada:</b> @ApiService.LastRequestUrl</p>
-                    <p class="mb-1"><b>API Key que el servidor vio:</b> @ApiService.LastServerSawApiKey</p>
-                    <p class="mb-0"><b>Último error:</b> @ApiService.LastError</p>
+                    <div class="row">
+                        <div class="col-12">
+                            <small class="text-muted">Última URL:</small>
+                            <p class="small mb-2">@ApiService.LastRequestUrl</p>
+                            
+                            <small class="text-muted">API Key del servidor:</small>
+                            <p class="small mb-2">@ApiService.LastServerSawApiKey</p>
+                            
+                            <small class="text-muted">Último error:</small>
+                            <p class="small mb-0">@ApiService.LastError</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     }
 
-    <button class="btn btn-link mt-2" @onclick="() => showDebug = !showDebug">
-        @(showDebug ? "Ocultar depuración" : "Mostrar depuración")
+    <button class="btn btn-outline-light btn-sm debug-toggle" @onclick="() => showDebug = !showDebug">
+        <i class="bi @(showDebug ? "bi-eye-slash" : "bi-eye") me-1"></i>
+        @(showDebug ? "Ocultar" : "Mostrar") Debug
     </button>
 </div>
+
 
 @code {
     private string usuario = string.Empty;
@@ -72,27 +139,58 @@
     private string mensaje = string.Empty;
     private bool isLoading = false;
     private bool showDebug = true;
+    private bool hasError = false;
+
+    private string GetAlertClass()
+    {
+        if (mensaje.Contains("Bienvenido"))
+            return "alert-success";
+        else if (mensaje.Contains("Error") || mensaje.Contains("incorrectos"))
+            return "alert-danger";
+        else
+            return "alert-info";
+    }
+
+    private string GetAlertIcon()
+    {
+        if (mensaje.Contains("Bienvenido"))
+            return "bi-check-circle";
+        else if (mensaje.Contains("Error") || mensaje.Contains("incorrectos"))
+            return "bi-exclamation-triangle";
+        else
+            return "bi-info-circle";
+    }
 
     private async Task IniciarSesion()
     {
+        if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(password))
+        {
+            mensaje = "Por favor, completa todos los campos.";
+            hasError = true;
+            return;
+        }
+
         mensaje = string.Empty;
+        hasError = false;
         isLoading = true;
+        StateHasChanged();
 
         try
         {
             var request = new Birlik_Mobile.Models.Request.LoginRequestDTO
             {
-                Usuario = usuario,
+                Usuario = usuario.Trim(),
                 PasswordHash = password
             };
 
             var result = await ApiService.LoginAsync(request);
-            isLoading = false;
-            StateHasChanged();
-
+            
             if (!result.IsSuccess || result.Data == null)
             {
-                mensaje = "Usuario o contraseña incorrectos.";
+                mensaje = "Usuario o contraseña incorrectos. Verifica tus credenciales.";
+                hasError = true;
+                isLoading = false;
+                StateHasChanged();
                 return;
             }
 
@@ -101,10 +199,13 @@
             // ✅ Guardamos el usuario en AuthService (memoria + SQLite)
             await AuthService.SetUserAsync(data.Usuario);
 
-            mensaje = $"Bienvenido {data.Usuario.Rol} ({data.Usuario.Usuario})";
+            mensaje = $"¡Bienvenido, {data.Usuario.Usuario}!";
+            hasError = false;
+            isLoading = false;
+            StateHasChanged();
 
             // Espera breve para mostrar mensaje de bienvenida
-            await Task.Delay(800);
+            await Task.Delay(1500);
 
             // ✅ Redirigimos a /home (donde se elegirá el dashboard según rol)
             NavManager.NavigateTo("/home", forceLoad: true);
@@ -112,8 +213,10 @@
         catch (Exception ex)
         {
             isLoading = false;
-            mensaje = $"Error al iniciar sesión: {ex.Message}";
+            hasError = true;
+            mensaje = $"Error de conexión. Verifica tu internet e intenta nuevamente.";
             Console.WriteLine($"❌ Error login: {ex}");
+            StateHasChanged();
         }
     }
 }

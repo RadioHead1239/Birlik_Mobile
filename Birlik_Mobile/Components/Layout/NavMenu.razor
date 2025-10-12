@@ -1,95 +1,222 @@
 ﻿@inject Birlik_Mobile.Services.AuthService AuthService
 @inject NavigationManager NavManager
 
-<!-- 🔹 Botón flotante para abrir el menú -->
-<button class="menu-fab" @onclick="ToggleMenu">
-    <i class="bi @(menuOpen ? "bi-x-lg" : "bi-list")"></i>
-</button>
-
-<!-- 🔹 Overlay (oscurece el fondo) -->
-<div class="menu-overlay @(menuOpen ? "show" : "")" @onclick="ToggleMenu"></div>
-
-<!-- 🔹 Menú lateral -->
-<div class="mobile-menu @(menuOpen ? "open" : "")">
+<!-- Menú lateral moderno -->
+<div class="nav-menu @(IsOpen ? "open" : "")">
     <div class="menu-header">
-        <h5>Birlik</h5>
+        <div class="brand-section">
+            <div class="brand-logo">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="brand-text">
+                <h4>Birlik</h4>
+                <p>Corredor de Seguros</p>
+            </div>
+        </div>
+        
         @if (AuthService.CurrentUser != null)
         {
-            <small>@AuthService.CurrentUser.Rol</small>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">@AuthService.CurrentUser.Usuario</span>
+                    <span class="user-role">@AuthService.CurrentUser.Rol</span>
+                </div>
+            </div>
         }
     </div>
 
-    <nav class="menu-body">
+    <nav class="menu-content">
         @if (AuthService.CurrentUser is not null)
         {
             var rol = AuthService.CurrentUser.Rol?.ToLower() ?? "";
 
-            @switch (rol)
-            {
-                case "cliente":
-                    <NavLink href="/cliente/dashboard" class="menu-item" Match="NavLinkMatch.All">
-                        <i class="bi bi-house-door"></i> Inicio
-                    </NavLink>
-                    <NavLink href="/cliente/polizas" class="menu-item">
-                        <i class="bi bi-shield-check"></i> Mis Pólizas
-                    </NavLink>
-                    <NavLink href="/cliente/facturas" class="menu-item">
-                        <i class="bi bi-receipt"></i> Mis Facturas
-                    </NavLink>
-                    <NavLink href="/cliente/datos" class="menu-item">
-                        <i class="bi bi-person-lines-fill"></i> Datos Personales
-                    </NavLink>
-                    <NavLink href="/cliente/emergencia" class="menu-item text-danger fw-bold">
-                        <i class="bi bi-exclamation-triangle"></i> Emergencia
-                    </NavLink>
-                    break;
+            <div class="menu-section">
+                <h6 class="section-title">Navegación</h6>
+                
+                @switch (rol)
+                {
+                    case "cliente":
+                        <NavLink href="/cliente/dashboard" class="nav-item" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-house-door"></i>
+                            </div>
+                            <span class="nav-text">Inicio</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/cliente/polizas" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <span class="nav-text">Mis Pólizas</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/cliente/facturas" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+                            <span class="nav-text">Mis Facturas</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/cliente/datos" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-person-lines-fill"></i>
+                            </div>
+                            <span class="nav-text">Datos Personales</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/cliente/emergencia" class="nav-item emergency" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <span class="nav-text">Emergencia</span>
+                            <div class="nav-badge">SOS</div>
+                        </NavLink>
+                        break;
 
-                case "gerente":
-                    <NavLink href="/gerente/dashboard" class="menu-item" Match="NavLinkMatch.All">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </NavLink>
-                    <NavLink href="/gerente/reportes" class="menu-item">
-                        <i class="bi bi-graph-up"></i> Reportes
-                    </NavLink>
-                    <NavLink href="/gerente/supervision" class="menu-item">
-                        <i class="bi bi-people"></i> Supervisión
-                    </NavLink>
-                    <NavLink href="/gerente/configuracion" class="menu-item">
-                        <i class="bi bi-gear"></i> Configuración
-                    </NavLink>
-                    break;
+                    case "gerente":
+                        <NavLink href="/gerente/dashboard" class="nav-item" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                            <span class="nav-text">Dashboard</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/gerente/reportes" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            <span class="nav-text">Reportes</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/gerente/supervision" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <span class="nav-text">Supervisión</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/gerente/configuracion" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-gear"></i>
+                            </div>
+                            <span class="nav-text">Configuración</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        break;
 
-                case "ejecutivo":
-                    <NavLink href="/ejecutivo/dashboard" class="menu-item" Match="NavLinkMatch.All">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </NavLink>
-                    <NavLink href="/ejecutivo/clientes" class="menu-item">
-                        <i class="bi bi-person-vcard"></i> Clientes
-                    </NavLink>
-                    <NavLink href="/ejecutivo/polizas" class="menu-item">
-                        <i class="bi bi-shield"></i> Pólizas
-                    </NavLink>
-                    <NavLink href="/ejecutivo/produccion" class="menu-item">
-                        <i class="bi bi-bar-chart-line"></i> Producción
-                    </NavLink>
-                    break;
-            }
+                    case "ejecutivo":
+                        <NavLink href="/ejecutivo/dashboard" class="nav-item" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                            <span class="nav-text">Dashboard</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/ejecutivo/clientes" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-person-vcard"></i>
+                            </div>
+                            <span class="nav-text">Clientes</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/ejecutivo/polizas" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-shield"></i>
+                            </div>
+                            <span class="nav-text">Pólizas</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        
+                        <NavLink href="/ejecutivo/produccion" class="nav-item" @onclick="CloseMenu">
+                            <div class="nav-icon">
+                                <i class="bi bi-bar-chart-line"></i>
+                            </div>
+                            <span class="nav-text">Producción</span>
+                            <div class="nav-arrow">
+                                <i class="bi bi-chevron-right"></i>
+                            </div>
+                        </NavLink>
+                        break;
+                }
+            </div>
 
-            <button class="menu-item logout" @onclick="CerrarSesion">
-                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-            </button>
+            <div class="menu-section">
+                <h6 class="section-title">Sistema</h6>
+                <button class="nav-item logout" @onclick="CerrarSesion">
+                    <div class="nav-icon">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+                    <span class="nav-text">Cerrar sesión</span>
+                    <div class="nav-arrow">
+                        <i class="bi bi-chevron-right"></i>
+                    </div>
+                </button>
+            </div>
         }
         else
         {
-            <p class="text-center text-muted mt-3">Inicia sesión para ver el menú</p>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <p>Inicia sesión para ver el menú</p>
+            </div>
         }
     </nav>
+
+    <div class="menu-footer">
+        <div class="version-info">
+            <small>Versión 1.0.0</small>
+            <small>© 2024 Birlik</small>
+        </div>
+    </div>
 </div>
 
 @code {
-    private bool menuOpen;
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
 
-    private void ToggleMenu() => menuOpen = !menuOpen;
+    private async Task CloseMenu()
+    {
+        if (OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+    }
 
     private async Task CerrarSesion()
     {

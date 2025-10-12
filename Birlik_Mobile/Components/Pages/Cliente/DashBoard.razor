@@ -1,26 +1,459 @@
 ﻿@page "/cliente/dashboard"
 @inject NavigationManager Nav
+@inject Birlik_Mobile.Services.AuthService AuthService
 
-<div class="container mt-4">
-    <h4 class="text-primary mb-3">
-        <i class="bi bi-person-badge me-2"></i>Bienvenido, Cliente
-    </h4>
+<div class="dashboard-container">
+    <!-- Header con saludo personalizado -->
+    <div class="welcome-header">
+        <div class="welcome-content">
+            <div class="user-greeting">
+                <h1 class="greeting-text">
+                    ¡Hola, <span class="text-gradient">@(AuthService.CurrentUser?.Usuario ?? "Cliente")</span>!
+                </h1>
+                <p class="greeting-subtitle">Gestiona tus seguros de manera fácil y segura</p>
+            </div>
+            <div class="user-avatar">
+                <i class="bi bi-person-circle"></i>
+            </div>
+        </div>
+        
+        <!-- Indicadores rápidos -->
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">Pólizas Activas</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">2</span>
+                    <span class="stat-label">Próximos Vencimientos</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="list-group shadow-sm">
-        <button class="list-group-item list-group-item-action" @onclick="@(()=>Nav.NavigateTo("/cliente/polizas"))">
-            <i class="bi bi-shield-check me-2"></i> Mis Pólizas
-        </button>
+    <!-- Acciones principales -->
+    <div class="main-actions">
+        <h3 class="section-title">
+            <i class="bi bi-grid-3x3-gap me-2"></i>
+            Acciones Principales
+        </h3>
+        
+        <div class="actions-grid">
+            <div class="action-card" @onclick="@(()=>Nav.NavigateTo("/cliente/polizas"))">
+                <div class="action-icon polizas">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Mis Pólizas</h4>
+                    <p>Consulta el estado de tus seguros</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
 
-        <button class="list-group-item list-group-item-action" @onclick="@(()=>Nav.NavigateTo("/cliente/facturas"))">
-            <i class="bi bi-receipt me-2"></i> Mis Facturas
-        </button>
+            <div class="action-card" @onclick="@(()=>Nav.NavigateTo("/cliente/facturas"))">
+                <div class="action-icon facturas">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Mis Facturas</h4>
+                    <p>Descarga tus comprobantes de pago</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
 
-        <button class="list-group-item list-group-item-action" @onclick="@(()=>Nav.NavigateTo("/cliente/datos"))">
-            <i class="bi bi-person-lines-fill me-2"></i> Datos Personales
-        </button>
+            <div class="action-card" @onclick="@(()=>Nav.NavigateTo("/cliente/datos"))">
+                <div class="action-icon datos">
+                    <i class="bi bi-person-lines-fill"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Datos Personales</h4>
+                    <p>Actualiza tu información</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
 
-        <button class="list-group-item list-group-item-action text-danger fw-bold" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
-            <i class="bi bi-exclamation-triangle me-2"></i> Botón de Emergencia
-        </button>
+            <div class="action-card emergency" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
+                <div class="action-icon emergency">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Emergencia</h4>
+                    <p>Solicita asistencia inmediata</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acceso rápido -->
+    <div class="quick-access">
+        <h3 class="section-title">
+            <i class="bi bi-lightning me-2"></i>
+            Acceso Rápido
+        </h3>
+        
+        <div class="quick-actions">
+            <button class="quick-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/polizas"))">
+                <i class="bi bi-shield-check"></i>
+                <span>Pólizas</span>
+            </button>
+            <button class="quick-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/facturas"))">
+                <i class="bi bi-receipt"></i>
+                <span>Facturas</span>
+            </button>
+            <button class="quick-btn emergency" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
+                <i class="bi bi-telephone"></i>
+                <span>SOS</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="info-cards">
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="bi bi-info-circle"></i>
+            </div>
+            <div class="info-content">
+                <h5>¿Necesitas ayuda?</h5>
+                <p>Contacta con tu ejecutivo de cuenta para cualquier consulta sobre tus seguros.</p>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+.dashboard-container {
+    padding: 1rem;
+    background: var(--light-bg);
+    min-height: 100vh;
+}
+
+.welcome-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: var(--border-radius-lg);
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: var(--card-shadow);
+}
+
+.welcome-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.user-greeting {
+    flex: 1;
+}
+
+.greeting-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.greeting-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.user-avatar {
+    font-size: 4rem;
+    opacity: 0.8;
+}
+
+.quick-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    opacity: 0.8;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.main-actions {
+    margin-bottom: 2rem;
+}
+
+.actions-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.action-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
+}
+
+.action-card.emergency {
+    border-color: var(--danger-color);
+    background: linear-gradient(135deg, #fef2f2, #ffffff);
+}
+
+.action-card.emergency:hover {
+    border-color: var(--danger-color);
+    background: linear-gradient(135deg, #fee2e2, #ffffff);
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.action-icon.polizas {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.action-icon.facturas {
+    background: linear-gradient(135deg, var(--success-color), #059669);
+}
+
+.action-icon.datos {
+    background: linear-gradient(135deg, var(--info-color), #0891b2);
+}
+
+.action-icon.emergency {
+    background: linear-gradient(135deg, var(--danger-color), #dc2626);
+}
+
+.action-content {
+    flex: 1;
+}
+
+.action-content h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: #1f2937;
+}
+
+.action-content p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.action-arrow {
+    color: #d1d5db;
+    font-size: 1.2rem;
+}
+
+.quick-access {
+    margin-bottom: 2rem;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-around;
+}
+
+.quick-btn {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    min-width: 80px;
+}
+
+.quick-btn:hover {
+    border-color: var(--primary-color);
+    background: #f8fafc;
+    transform: translateY(-2px);
+}
+
+.quick-btn.emergency {
+    border-color: var(--danger-color);
+    background: linear-gradient(135deg, #fef2f2, #ffffff);
+}
+
+.quick-btn.emergency:hover {
+    border-color: var(--danger-color);
+    background: linear-gradient(135deg, #fee2e2, #ffffff);
+}
+
+.quick-btn i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.quick-btn.emergency i {
+    color: var(--danger-color);
+}
+
+.quick-btn span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.info-cards {
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+}
+
+.info-icon {
+    font-size: 2rem;
+    color: var(--info-color);
+    margin-top: 0.25rem;
+}
+
+.info-content h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+}
+
+.info-content p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 0.75rem;
+    }
+    
+    .welcome-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .greeting-text {
+        font-size: 1.5rem;
+    }
+    
+    .user-avatar {
+        font-size: 3rem;
+    }
+    
+    .quick-stats {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .action-card {
+        padding: 1rem;
+    }
+    
+    .action-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .quick-actions {
+        gap: 0.5rem;
+    }
+    
+    .quick-btn {
+        padding: 0.75rem 0.5rem;
+        min-width: 70px;
+    }
+    
+    .quick-btn i {
+        font-size: 1.2rem;
+    }
+    
+    .quick-btn span {
+        font-size: 0.7rem;
+    }
+}
+</style>

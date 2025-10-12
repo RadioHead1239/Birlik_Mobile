@@ -1,40 +1,452 @@
 ﻿@page "/cliente/datos"
 @inject NavigationManager Nav
+@inject Birlik_Mobile.Services.AuthService AuthService
 
 <RoleGuard AllowedRole="Cliente">
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="text-primary mb-0">
-                <i class="bi bi-person-lines-fill me-2"></i> Datos Personales
-            </h4>
-            <button class="btn btn-outline-secondary btn-sm" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
-                <i class="bi bi-arrow-left"></i> Volver
+    <div class="datos-container">
+        <!-- Header -->
+        <div class="page-header">
+            <button class="back-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
+                <i class="bi bi-arrow-left"></i>
             </button>
-        </div>
-
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Nombres</label>
-                        <input type="text" class="form-control" value="Juan Pérez" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-control" value="juanperez@correo.com" readonly />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Teléfono</label>
-                        <input type="text" class="form-control" value="+51 987654321" readonly />
-                    </div>
-
-                    <button type="button" class="btn btn-outline-primary w-100">
-                        <i class="bi bi-pencil me-1"></i> Editar datos
-                    </button>
-                </form>
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="bi bi-person-lines-fill me-2"></i>
+                    Datos Personales
+                </h1>
+                <p class="page-subtitle">Gestiona tu información personal</p>
             </div>
         </div>
+
+        <!-- Información del usuario -->
+        <div class="user-profile">
+            <div class="profile-avatar">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="profile-info">
+                <h3>@(AuthService.CurrentUser?.Usuario ?? "Usuario")</h3>
+                <p class="text-muted">Cliente desde 2024</p>
+            </div>
+        </div>
+
+        <!-- Formulario de datos -->
+        <div class="form-container">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Información Personal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form @onsubmit="GuardarDatos" @onsubmit:preventDefault="true">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" 
+                                           class="form-control @(isEditing ? "" : "bg-light")" 
+                                           id="nombres"
+                                           placeholder="Nombres"
+                                           @bind="datosPersonales.Nombres"
+                                           readonly="@(!isEditing)" />
+                                    <label for="nombres">
+                                        <i class="bi bi-person me-1"></i>Nombres Completos
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" 
+                                           class="form-control @(isEditing ? "" : "bg-light")" 
+                                           id="apellidos"
+                                           placeholder="Apellidos"
+                                           @bind="datosPersonales.Apellidos"
+                                           readonly="@(!isEditing)" />
+                                    <label for="apellidos">
+                                        <i class="bi bi-person-badge me-1"></i>Apellidos
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="email" 
+                                           class="form-control @(isEditing ? "" : "bg-light")" 
+                                           id="email"
+                                           placeholder="Correo electrónico"
+                                           @bind="datosPersonales.Email"
+                                           readonly="@(!isEditing)" />
+                                    <label for="email">
+                                        <i class="bi bi-envelope me-1"></i>Correo Electrónico
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="tel" 
+                                           class="form-control @(isEditing ? "" : "bg-light")" 
+                                           id="telefono"
+                                           placeholder="Teléfono"
+                                           @bind="datosPersonales.Telefono"
+                                           readonly="@(!isEditing)" />
+                                    <label for="telefono">
+                                        <i class="bi bi-telephone me-1"></i>Teléfono
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control @(isEditing ? "" : "bg-light")" 
+                                   id="direccion"
+                                   placeholder="Dirección"
+                                   @bind="datosPersonales.Direccion"
+                                   readonly="@(!isEditing)" />
+                            <label for="direccion">
+                                <i class="bi bi-geo-alt me-1"></i>Dirección
+                            </label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" 
+                                           class="form-control @(isEditing ? "" : "bg-light")" 
+                                           id="dni"
+                                           placeholder="DNI"
+                                           @bind="datosPersonales.DNI"
+                                           readonly="@(!isEditing)" />
+                                    <label for="dni">
+                                        <i class="bi bi-card-text me-1"></i>DNI
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="date" 
+                                           class="form-control @(isEditing ? "" : "bg-light")" 
+                                           id="fechaNacimiento"
+                                           @bind="datosPersonales.FechaNacimiento"
+                                           readonly="@(!isEditing)" />
+                                    <label for="fechaNacimiento">
+                                        <i class="bi bi-calendar3 me-1"></i>Fecha de Nacimiento
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="form-actions">
+                            @if (!isEditing)
+                            {
+                                <button type="button" 
+                                        class="btn btn-primary w-100" 
+                                        @onclick="HabilitarEdicion">
+                                    <i class="bi bi-pencil me-2"></i>
+                                    Editar Información
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" 
+                                            class="btn btn-outline-secondary" 
+                                            @onclick="CancelarEdicion">
+                                        <i class="bi bi-x-circle me-2"></i>
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" 
+                                            class="btn btn-primary" 
+                                            disabled="@isSaving">
+                                        @if (isSaving)
+                                        {
+                                            <span class="loading me-2"></span>
+                                            <span>Guardando...</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            <span>Guardar Cambios</span>
+                                        }
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="info-section">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-shield-check me-2"></i>
+                        Información de Seguridad
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="security-info">
+                        <div class="security-item">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <span>Verificación de identidad completada</span>
+                        </div>
+                        <div class="security-item">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <span>Correo electrónico verificado</span>
+                        </div>
+                        <div class="security-item">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <span>Teléfono verificado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert @GetAlertClass()">
+                <i class="bi @GetAlertIcon() me-2"></i>
+                @mensaje
+            </div>
+        }
     </div>
 </RoleGuard>
+
+<style>
+.datos-container {
+    padding: 1rem;
+    background: var(--light-bg);
+    min-height: 100vh;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.back-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.back-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.header-content {
+    flex: 1;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.page-subtitle {
+    color: #6b7280;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.user-profile {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.profile-avatar {
+    font-size: 4rem;
+    opacity: 0.9;
+}
+
+.profile-info h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+}
+
+.profile-info p {
+    margin: 0;
+    opacity: 0.8;
+}
+
+.form-container {
+    margin-bottom: 2rem;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.info-section {
+    margin-bottom: 2rem;
+}
+
+.security-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.security-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid var(--success-color);
+}
+
+.security-item i {
+    font-size: 1.2rem;
+}
+
+.security-item span {
+    font-weight: 500;
+    color: #374151;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .datos-container {
+        padding: 0.75rem;
+    }
+    
+    .page-header {
+        padding: 0.75rem;
+    }
+    
+    .page-title {
+        font-size: 1.3rem;
+    }
+    
+    .user-profile {
+        padding: 1.5rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .profile-avatar {
+        font-size: 3rem;
+    }
+    
+    .form-actions .d-grid {
+        display: grid !important;
+    }
+    
+    .form-actions .d-md-flex {
+        display: flex !important;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+</style>
+
+@code {
+    private bool isEditing = false;
+    private bool isSaving = false;
+    private string mensaje = string.Empty;
+
+    private DatosPersonalesModel datosPersonales = new();
+
+    private class DatosPersonalesModel
+    {
+        public string Nombres { get; set; } = "Juan Carlos";
+        public string Apellidos { get; set; } = "Pérez González";
+        public string Email { get; set; } = "juan.perez@email.com";
+        public string Telefono { get; set; } = "+51 987 654 321";
+        public string Direccion { get; set; } = "Av. Principal 123, Lima, Perú";
+        public string DNI { get; set; } = "12345678";
+        public DateTime FechaNacimiento { get; set; } = new DateTime(1985, 6, 15);
+    }
+
+    private void HabilitarEdicion()
+    {
+        isEditing = true;
+        mensaje = string.Empty;
+    }
+
+    private void CancelarEdicion()
+    {
+        isEditing = false;
+        mensaje = string.Empty;
+        // Aquí podrías restaurar los datos originales si es necesario
+    }
+
+    private async Task GuardarDatos()
+    {
+        isSaving = true;
+        mensaje = string.Empty;
+
+        try
+        {
+            // Simular guardado
+            await Task.Delay(1500);
+
+            isEditing = false;
+            mensaje = "Información actualizada correctamente.";
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error al guardar los datos. Inténtalo nuevamente.";
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private string GetAlertClass()
+    {
+        if (mensaje.Contains("correctamente"))
+            return "alert-success";
+        else if (mensaje.Contains("Error"))
+            return "alert-danger";
+        else
+            return "alert-info";
+    }
+
+    private string GetAlertIcon()
+    {
+        if (mensaje.Contains("correctamente"))
+            return "bi-check-circle";
+        else if (mensaje.Contains("Error"))
+            return "bi-exclamation-triangle";
+        else
+            return "bi-info-circle";
+    }
+}

@@ -3,33 +3,64 @@
 @inject NavigationManager NavManager
 
 <div class="app-container">
-    <!-- 🔹 Barra superior -->
+    <!-- Barra superior mejorada -->
     <header class="app-header">
-        <button class="menu-btn" @onclick="ToggleMenu">
-            <i class="bi @(menuOpen ? "bi-x-lg" : "bi-list")"></i>
-        </button>
+        <div class="header-left">
+            <button class="menu-btn" @onclick="ToggleMenu">
+                <i class="bi @(menuOpen ? "bi-x-lg" : "bi-list")"></i>
+            </button>
+            <div class="header-brand">
+                <h1 class="app-title">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Birlik
+                </h1>
+                <p class="app-subtitle">Corredor de Seguros</p>
+            </div>
+        </div>
 
-        <h6 class="app-title">Birlik</h6>
-
-        @if (AuthService.CurrentUser != null)
-        {
-            <small class="user-role">@AuthService.CurrentUser.Rol</small>
-        }
+        <div class="header-right">
+            @if (AuthService.CurrentUser != null)
+            {
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">@AuthService.CurrentUser.Usuario</span>
+                        <span class="user-role">@AuthService.CurrentUser.Rol</span>
+                    </div>
+                </div>
+            }
+        </div>
     </header>
 
-    <!-- 🔹 Menú lateral tipo Drawer -->
+    <!-- Overlay del drawer -->
     <div class="drawer-overlay @(menuOpen ? "show" : "")" @onclick="CloseMenu"></div>
 
+    <!-- Menú lateral mejorado -->
     <aside class="drawer @(menuOpen ? "open" : "")">
-        <NavMenu />
+        <NavMenu IsOpen="menuOpen" OnClose="CloseMenu" />
     </aside>
 
-    <!-- 🔹 Contenido principal -->
+    <!-- Contenido principal -->
     <main class="app-content">
         @Body
-
     </main>
+
+    <!-- Botón flotante de emergencia (solo para clientes) -->
+    @if (AuthService.CurrentUser?.Rol?.ToLower() == "cliente")
+    {
+        <button class="emergency-fab" @onclick="@(() => NavManager.NavigateTo("/cliente/emergencia"))">
+            <i class="bi bi-exclamation-triangle"></i>
+        </button>
+    }
+
+    <!-- Notificaciones toast -->
+    <div class="toast-container">
+        <!-- Aquí se pueden agregar notificaciones toast dinámicas -->
+    </div>
 </div>
+
 
 @code {
     private bool menuOpen;

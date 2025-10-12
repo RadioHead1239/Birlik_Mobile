@@ -1,122 +1,343 @@
-﻿/* 🔹 Botón flotante (FAB) */
-.menu-fab {
+﻿/* ===== NAVEGACIÓN MODERNA ===== */
+.nav-menu {
     position: fixed;
-    top: 0.75rem;
-    left: 0.75rem;
-    background: linear-gradient(135deg, #0062cc, #004c99);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    font-size: 1.4rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    z-index: 3001;
+    top: 0;
+    left: -320px;
+    width: 320px;
+    height: 100vh;
+    background: var(--white);
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+    z-index: 1050;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-menu.open {
+    left: 0;
+}
+
+/* ===== HEADER DEL MENÚ ===== */
+.menu-header {
+    background: var(--primary-gradient);
+    color: var(--white);
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.brand-logo {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.5rem;
+    backdrop-filter: blur(10px);
 }
 
-/* 🔹 Overlay oscuro al abrir */
-.menu-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 3000;
+.brand-text h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
 }
 
-    .menu-overlay.show {
-        opacity: 1;
-        visibility: visible;
-    }
-
-/* 🔹 Drawer lateral */
-.mobile-menu {
-    position: fixed;
-    top: 0;
-    left: -260px;
-    width: 240px;
-    height: 100%;
-    background: #1e1e2f;
-    color: #d7d7d7;
-    z-index: 3002;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.25);
-    transition: left 0.3s ease;
-    display: flex;
-    flex-direction: column;
+.brand-text p {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 500;
 }
 
-    .mobile-menu.open {
-        left: 0;
-    }
-
-/* 🔹 Cabecera del menú */
-.menu-header {
-    padding: 1.5rem 1rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-    .menu-header h5 {
-        color: #fff;
-        margin: 0;
-        font-size: 1.1rem;
-    }
-
-    .menu-header small {
-        color: #bbb;
-        font-size: 0.8rem;
-    }
-
-/* 🔹 Cuerpo del menú */
-.menu-body {
+.user-profile {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     padding: 1rem;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.menu-item {
-    color: #d7d7d7;
-    text-decoration: none;
+.user-avatar {
+    font-size: 2rem;
+    opacity: 0.9;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.125rem 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* ===== CONTENIDO DEL MENÚ ===== */
+.menu-content {
+    flex: 1;
+    padding: 1.5rem 0;
+}
+
+.menu-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 1rem 1.5rem;
+}
+
+.nav-item {
     display: flex;
     align-items: center;
-    padding: 0.9rem 1rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: background 0.2s, transform 0.1s;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: #374151;
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: all 0.2s ease;
+    position: relative;
+    border-left: 4px solid transparent;
 }
 
-    .menu-item i {
-        font-size: 1.3rem;
-        margin-right: 0.75rem;
-    }
+.nav-item:hover {
+    background: var(--blue-50);
+    color: var(--primary-color);
+    text-decoration: none;
+    transform: translateX(4px);
+}
 
-    .menu-item:hover, .menu-item.active {
-        background: rgba(255,255,255,0.1);
-        color: #fff;
-        transform: scale(1.02);
-    }
-
-/* 🔹 Cerrar sesión */
-.logout {
-    background: transparent;
-    border: none;
-    color: #ff6b6b;
-    text-align: left;
+.nav-item.active {
+    background: var(--blue-50);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
     font-weight: 600;
 }
 
-    .logout i {
-        margin-right: 0.75rem;
-    }
+.nav-item.emergency {
+    background: linear-gradient(135deg, #fef2f2, #ffffff);
+    border-left-color: var(--danger-color);
+    color: var(--danger-color);
+    margin: 0.5rem 1rem;
+    border-radius: 12px;
+    border-left-width: 4px;
+}
 
-/* Ocultar scroll de fondo al abrir el menú */
-body.menu-open {
-    overflow: hidden;
+.nav-item.emergency:hover {
+    background: linear-gradient(135deg, #fee2e2, #ffffff);
+    transform: translateX(4px);
+}
+
+.nav-item.logout {
+    color: var(--danger-color);
+    border-top: 1px solid var(--medium-gray);
+    margin-top: 0.5rem;
+}
+
+.nav-item.logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+}
+
+.nav-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--blue-50);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    transition: all 0.2s ease;
+}
+
+.nav-item.emergency .nav-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+}
+
+.nav-item.logout .nav-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+}
+
+.nav-item:hover .nav-icon,
+.nav-item.active .nav-icon {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: scale(1.1);
+}
+
+.nav-text {
+    flex: 1;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.nav-arrow {
+    color: #d1d5db;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover .nav-arrow {
+    color: var(--primary-color);
+    transform: translateX(2px);
+}
+
+.nav-badge {
+    background: var(--danger-color);
+    color: var(--white);
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+/* ===== ESTADO VACÍO ===== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--dark-gray);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--medium-gray);
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ===== FOOTER DEL MENÚ ===== */
+.menu-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--medium-gray);
+    background: var(--light-gray);
+}
+
+.version-info {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.version-info small {
+    color: var(--dark-gray);
+    font-size: 0.75rem;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .nav-menu {
+        width: 280px;
+        left: -280px;
+    }
+    
+    .menu-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .brand-section {
+        gap: 0.75rem;
+    }
+    
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+    
+    .brand-text h4 {
+        font-size: 1.25rem;
+    }
+    
+    .brand-text p {
+        font-size: 0.8rem;
+    }
+    
+    .user-profile {
+        padding: 0.75rem;
+    }
+    
+    .user-avatar {
+        font-size: 1.5rem;
+    }
+    
+    .user-name {
+        font-size: 0.9rem;
+    }
+    
+    .nav-item {
+        padding: 0.875rem 1rem;
+    }
+    
+    .nav-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .nav-text {
+        font-size: 0.9rem;
+    }
+    
+    .menu-footer {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-menu {
+        width: 100vw;
+        left: -100vw;
+    }
 }
