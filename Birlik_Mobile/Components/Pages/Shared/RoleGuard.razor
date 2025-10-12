@@ -1,0 +1,21 @@
+﻿@inject Birlik_Mobile.Services.AuthService AuthService
+@inject NavigationManager NavManager
+
+@if (AuthService.CurrentUser?.Rol?.Equals(AllowedRole, StringComparison.OrdinalIgnoreCase) ?? false)
+{
+    @ChildContent
+}
+else
+{
+    <div class="text-center mt-5">
+        <p class="text-danger fw-bold">Acceso no autorizado.</p>
+        <button class="btn btn-primary" @onclick="@(() => NavManager.NavigateTo("/"))">
+            Volver al inicio
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter] public string AllowedRole { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

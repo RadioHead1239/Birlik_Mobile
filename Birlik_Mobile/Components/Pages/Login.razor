@@ -1,0 +1,119 @@
+﻿@page "/"
+@inject Birlik_Mobile.Services.ApiService ApiService
+@inject Birlik_Mobile.Services.AuthService AuthService
+@inject NavigationManager NavManager
+
+<div class="d-flex flex-column justify-content-center align-items-center vh-100 bg-light">
+    <div class="card shadow p-4" style="width: 320px; border-radius: 12px;">
+        <div class="text-center mb-3">
+            <img src="https://plataformabirlik.azurewebsites.net/Theme/Front-v2-1/dist/assets/imagen/presentacion/logobi_n.svg" alt="Logo Corredor" width="300" />
+            <small class="text-muted">Iniciar sesión</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Usuario"
+                   @bind="usuario"
+                   @bind:event="oninput" />
+        </div>
+
+        <div class="form-group mb-3">
+            <input type="password"
+                   class="form-control"
+                   placeholder="Contraseña"
+                   @bind="password"
+                   @bind:event="oninput" />
+        </div>
+
+        <button class="btn btn-primary w-100" @onclick="IniciarSesion" disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                <span>Verificando...</span>
+            }
+            else
+            {
+                <span>Ingresar</span>
+            }
+        </button>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="alert alert-info mt-3 text-center p-2">@mensaje</div>
+        }
+    </div>
+
+    <footer class="text-muted mt-4" style="font-size: 0.8rem;">
+        © @DateTime.Now.Year Corredor de Seguros - Todos los derechos reservados
+    </footer>
+
+    @if (showDebug)
+    {
+        <div class="mt-4 w-100" style="max-width: 640px;">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="mb-1"><b>URL llamada:</b> @ApiService.LastRequestUrl</p>
+                    <p class="mb-1"><b>API Key que el servidor vio:</b> @ApiService.LastServerSawApiKey</p>
+                    <p class="mb-0"><b>Último error:</b> @ApiService.LastError</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <button class="btn btn-link mt-2" @onclick="() => showDebug = !showDebug">
+        @(showDebug ? "Ocultar depuración" : "Mostrar depuración")
+    </button>
+</div>
+
+@code {
+    private string usuario = string.Empty;
+    private string password = string.Empty;
+    private string mensaje = string.Empty;
+    private bool isLoading = false;
+    private bool showDebug = true;
+
+    private async Task IniciarSesion()
+    {
+        mensaje = string.Empty;
+        isLoading = true;
+
+        try
+        {
+            var request = new Birlik_Mobile.Models.Request.LoginRequestDTO
+            {
+                Usuario = usuario,
+                PasswordHash = password
+            };
+
+            var result = await ApiService.LoginAsync(request);
+            isLoading = false;
+            StateHasChanged();
+
+            if (!result.IsSuccess || result.Data == null)
+            {
+                mensaje = "Usuario o contraseña incorrectos.";
+                return;
+            }
+
+            var data = result.Data;
+
+            // ✅ Guardamos el usuario en AuthService (memoria + SQLite)
+            await AuthService.SetUserAsync(data.Usuario);
+
+            mensaje = $"Bienvenido {data.Usuario.Rol} ({data.Usuario.Usuario})";
+
+            // Espera breve para mostrar mensaje de bienvenida
+            await Task.Delay(800);
+
+            // ✅ Redirigimos a /home (donde se elegirá el dashboard según rol)
+            NavManager.NavigateTo("/home", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            isLoading = false;
+            mensaje = $"Error al iniciar sesión: {ex.Message}";
+            Console.WriteLine($"❌ Error login: {ex}");
+        }
+    }
+}

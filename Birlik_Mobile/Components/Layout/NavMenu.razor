@@ -1,27 +1,99 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Birlik_Mobile</a>
+﻿@inject Birlik_Mobile.Services.AuthService AuthService
+@inject NavigationManager NavManager
+
+<!-- 🔹 Botón flotante para abrir el menú -->
+<button class="menu-fab" @onclick="ToggleMenu">
+    <i class="bi @(menuOpen ? "bi-x-lg" : "bi-list")"></i>
+</button>
+
+<!-- 🔹 Overlay (oscurece el fondo) -->
+<div class="menu-overlay @(menuOpen ? "show" : "")" @onclick="ToggleMenu"></div>
+
+<!-- 🔹 Menú lateral -->
+<div class="mobile-menu @(menuOpen ? "open" : "")">
+    <div class="menu-header">
+        <h5>Birlik</h5>
+        @if (AuthService.CurrentUser != null)
+        {
+            <small>@AuthService.CurrentUser.Rol</small>
+        }
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+    <nav class="menu-body">
+        @if (AuthService.CurrentUser is not null)
+        {
+            var rol = AuthService.CurrentUser.Rol?.ToLower() ?? "";
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
+            @switch (rol)
+            {
+                case "cliente":
+                    <NavLink href="/cliente/dashboard" class="menu-item" Match="NavLinkMatch.All">
+                        <i class="bi bi-house-door"></i> Inicio
+                    </NavLink>
+                    <NavLink href="/cliente/polizas" class="menu-item">
+                        <i class="bi bi-shield-check"></i> Mis Pólizas
+                    </NavLink>
+                    <NavLink href="/cliente/facturas" class="menu-item">
+                        <i class="bi bi-receipt"></i> Mis Facturas
+                    </NavLink>
+                    <NavLink href="/cliente/datos" class="menu-item">
+                        <i class="bi bi-person-lines-fill"></i> Datos Personales
+                    </NavLink>
+                    <NavLink href="/cliente/emergencia" class="menu-item text-danger fw-bold">
+                        <i class="bi bi-exclamation-triangle"></i> Emergencia
+                    </NavLink>
+                    break;
+
+                case "gerente":
+                    <NavLink href="/gerente/dashboard" class="menu-item" Match="NavLinkMatch.All">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </NavLink>
+                    <NavLink href="/gerente/reportes" class="menu-item">
+                        <i class="bi bi-graph-up"></i> Reportes
+                    </NavLink>
+                    <NavLink href="/gerente/supervision" class="menu-item">
+                        <i class="bi bi-people"></i> Supervisión
+                    </NavLink>
+                    <NavLink href="/gerente/configuracion" class="menu-item">
+                        <i class="bi bi-gear"></i> Configuración
+                    </NavLink>
+                    break;
+
+                case "ejecutivo":
+                    <NavLink href="/ejecutivo/dashboard" class="menu-item" Match="NavLinkMatch.All">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </NavLink>
+                    <NavLink href="/ejecutivo/clientes" class="menu-item">
+                        <i class="bi bi-person-vcard"></i> Clientes
+                    </NavLink>
+                    <NavLink href="/ejecutivo/polizas" class="menu-item">
+                        <i class="bi bi-shield"></i> Pólizas
+                    </NavLink>
+                    <NavLink href="/ejecutivo/produccion" class="menu-item">
+                        <i class="bi bi-bar-chart-line"></i> Producción
+                    </NavLink>
+                    break;
+            }
+
+            <button class="menu-item logout" @onclick="CerrarSesion">
+                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+            </button>
+        }
+        else
+        {
+            <p class="text-center text-muted mt-3">Inicia sesión para ver el menú</p>
+        }
     </nav>
 </div>
+
+@code {
+    private bool menuOpen;
+
+    private void ToggleMenu() => menuOpen = !menuOpen;
+
+    private async Task CerrarSesion()
+    {
+        await AuthService.LogoutAsync();
+        NavManager.NavigateTo("/", forceLoad: true);
+    }
+}

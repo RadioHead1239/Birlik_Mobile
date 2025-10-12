@@ -1,0 +1,26 @@
+﻿@page "/cliente/dashboard"
+@inject NavigationManager Nav
+
+<div class="container mt-4">
+    <h4 class="text-primary mb-3">
+        <i class="bi bi-person-badge me-2"></i>Bienvenido, Cliente
+    </h4>
+
+    <div class="list-group shadow-sm">
+        <button class="list-group-item list-group-item-action" @onclick="@(()=>Nav.NavigateTo("/cliente/polizas"))">
+            <i class="bi bi-shield-check me-2"></i> Mis Pólizas
+        </button>
+
+        <button class="list-group-item list-group-item-action" @onclick="@(()=>Nav.NavigateTo("/cliente/facturas"))">
+            <i class="bi bi-receipt me-2"></i> Mis Facturas
+        </button>
+
+        <button class="list-group-item list-group-item-action" @onclick="@(()=>Nav.NavigateTo("/cliente/datos"))">
+            <i class="bi bi-person-lines-fill me-2"></i> Datos Personales
+        </button>
+
+        <button class="list-group-item list-group-item-action text-danger fw-bold" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
+            <i class="bi bi-exclamation-triangle me-2"></i> Botón de Emergencia
+        </button>
+    </div>
+</div>

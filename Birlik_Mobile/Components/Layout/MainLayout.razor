@@ -1,17 +1,39 @@
 ﻿@inherits LayoutComponentBase
+@inject Birlik_Mobile.Services.AuthService AuthService
+@inject NavigationManager NavManager
 
-<div class="page">
-    <div class="sidebar">
+<div class="app-container">
+    <!-- 🔹 Barra superior -->
+    <header class="app-header">
+        <button class="menu-btn" @onclick="ToggleMenu">
+            <i class="bi @(menuOpen ? "bi-x-lg" : "bi-list")"></i>
+        </button>
+
+        <h6 class="app-title">Birlik</h6>
+
+        @if (AuthService.CurrentUser != null)
+        {
+            <small class="user-role">@AuthService.CurrentUser.Rol</small>
+        }
+    </header>
+
+    <!-- 🔹 Menú lateral tipo Drawer -->
+    <div class="drawer-overlay @(menuOpen ? "show" : "")" @onclick="CloseMenu"></div>
+
+    <aside class="drawer @(menuOpen ? "open" : "")">
         <NavMenu />
-    </div>
+    </aside>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+    <!-- 🔹 Contenido principal -->
+    <main class="app-content">
+        @Body
 
-        <article class="content px-4">
-            @Body
-        </article>
     </main>
 </div>
+
+@code {
+    private bool menuOpen;
+
+    private void ToggleMenu() => menuOpen = !menuOpen;
+    private void CloseMenu() => menuOpen = false;
+}
