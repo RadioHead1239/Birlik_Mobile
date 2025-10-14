@@ -1,0 +1,493 @@
+/* ===== VISTA DE INCLUSIONES ===== */
+.inclusiones-container {
+    padding: 1rem;
+    background: var(--light-gray);
+    min-height: 100vh;
+}
+
+/* ===== HEADER DE PÁGINA ===== */
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow);
+}
+
+.back-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    flex: 1;
+}
+
+/* ===== INFORMACIÓN DEL PROCESO ===== */
+.process-info {
+    background: linear-gradient(135deg, #eff6ff, #ffffff);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--info-color);
+}
+
+.info-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--info-color);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.info-content h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+}
+
+.info-content p {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ===== FORMULARIO PRINCIPAL ===== */
+.form-container {
+    background: var(--white);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 1.5rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ===== FORMULARIO FLOTANTE ===== */
+.form-floating {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.form-floating > .form-control {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+    border: 2px solid var(--medium-gray);
+    border-radius: 12px;
+    background: var(--light-gray);
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.form-floating > .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: var(--white);
+}
+
+.form-floating > .form-control.is-invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-floating > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    border: 2px solid transparent;
+    transform-origin: 0 0;
+    transition: all 0.3s ease;
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: 0.65;
+    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    color: var(--primary-color);
+}
+
+.form-help {
+    color: var(--dark-gray);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* ===== RADIO BUTTONS ===== */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+}
+
+.radio-item input[type="radio"] {
+    display: none;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--medium-gray);
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.radio-item input[type="radio"]:checked + .radio-label .radio-custom {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+}
+
+.radio-item input[type="radio"]:checked + .radio-label .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--white);
+}
+
+/* ===== CHECKBOXES ===== */
+.checkbox-group {
+    margin-bottom: 1rem;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-item input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.checkbox-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--medium-gray);
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.checkbox-item input[type="checkbox"]:checked + .checkbox-label .checkbox-custom {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+}
+
+.checkbox-item input[type="checkbox"]:checked + .checkbox-label .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--white);
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* ===== DESCARGA DE PLANTILLA ===== */
+.download-template {
+    margin-bottom: 1rem;
+}
+
+.template-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.template-link:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    text-decoration: none;
+}
+
+/* ===== SUBIDA DE ARCHIVOS ===== */
+.file-upload {
+    margin-top: 1rem;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.file-label:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--card-shadow);
+}
+
+.file-info {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: var(--light-gray);
+    border-radius: 8px;
+    border: 1px solid var(--medium-gray);
+}
+
+.no-file {
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+}
+
+.file-selected {
+    color: var(--success-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* ===== CAMPOS OBLIGATORIOS ===== */
+.required-fields {
+    text-align: center;
+    margin: 1.5rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--medium-gray);
+}
+
+.required-fields small {
+    color: var(--dark-gray);
+    font-size: 0.8rem;
+}
+
+/* ===== BOTÓN DE ENVÍO ===== */
+.submit-section {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn-submit {
+    background: var(--primary-gradient);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--card-shadow);
+    min-width: 200px;
+    justify-content: center;
+}
+
+.btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===== ESTADO DE CARGA ===== */
+.loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid var(--white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== ALERTAS ===== */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #f0fdf4, #ffffff);
+    border-left-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #fef2f2, #ffffff);
+    border-left-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .inclusiones-container {
+        padding: 0.75rem;
+    }
+    
+    .page-header {
+        margin-bottom: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.3rem;
+    }
+    
+    .form-container {
+        padding: 1rem;
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 1rem 2rem;
+    }
+    
+    .info-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .info-icon {
+        align-self: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-floating > .form-control {
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+    
+    .file-label {
+        width: 100%;
+        justify-content: center;
+    }
+}

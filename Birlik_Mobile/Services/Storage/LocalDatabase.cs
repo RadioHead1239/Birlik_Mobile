@@ -6,10 +6,14 @@ namespace Birlik_Mobile.Services.Storage
     {
         private readonly SQLiteAsyncConnection _db;
 
-        public LocalDatabase(string dbPath)
+        public LocalDatabase()
         {
+            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "birlik_session.db3");
             _db = new SQLiteAsyncConnection(dbPath);
+
             _db.CreateTableAsync<UserSession>().Wait();
+            Console.WriteLine($"📁 Ruta de BD local: {dbPath}");
+
         }
 
         public Task<int> SaveSessionAsync(UserSession session)
@@ -33,8 +37,9 @@ namespace Birlik_Mobile.Services.Storage
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
+
         public string Usuario { get; set; } = "";
-        public string Rol { get; set; } = "";
-        public string Token { get; set; } = ""; 
+        public string Rol { get; set; } = "Cliente";
+        public string Token { get; set; } = "";
     }
 }

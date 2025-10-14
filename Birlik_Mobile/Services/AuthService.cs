@@ -17,8 +17,23 @@ namespace Birlik_Mobile.Services
 
         public async Task InitializeAsync()
         {
-            CurrentUser = await _db.GetSessionAsync();
+            try
+            {
+                Console.WriteLine("🟡 Iniciando AuthService.InitializeAsync...");
+                CurrentUser = await _db.GetSessionAsync();
+
+                if (CurrentUser == null)
+                    Console.WriteLine("⚪ No hay sesión guardada.");
+                else
+                    Console.WriteLine($"✅ Sesión encontrada: {CurrentUser.Usuario} ({CurrentUser.Rol})");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error al inicializar AuthService: {ex}");
+                CurrentUser = null;
+            }
         }
+
 
         public async Task SetUserAsync(UsuarioInfoDTO user)
         {

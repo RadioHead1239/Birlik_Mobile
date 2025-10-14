@@ -1,0 +1,342 @@
+@page "/ejecutivo/inclusiones"
+@inject NavigationManager Nav
+
+<div class="inclusiones-container">
+    <!-- Header de la página -->
+    <div class="page-header">
+        <button class="back-btn" @onclick="@(() => Nav.NavigateTo("/ejecutivo/dashboard"))">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="page-title">Procesar Inclusiones</h1>
+    </div>
+
+    <!-- Información del proceso -->
+    <div class="process-info">
+        <div class="info-header">
+            <div class="info-icon">
+                <i class="bi bi-info-circle"></i>
+            </div>
+            <div class="info-content">
+                <h3>Proceso de Inclusión</h3>
+                <p>Completa los datos del formulario para procesar la inclusión del cliente.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="form-container">
+        <form @onsubmit="ProcesarInclusion" @onsubmit:preventDefault="true">
+            <!-- Información personal -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="bi bi-person me-2"></i>
+                    Información Personal
+                </h4>
+                
+                <div class="form-row">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="nombres" placeholder="Nombres" 
+                               @bind="inclusionData.Nombres" required>
+                        <label for="nombres">Nombres Completos *</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="ruc" placeholder="RUC" 
+                               @bind="inclusionData.RUC" required maxlength="12">
+                        <label for="ruc">RUC *</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tipo de proceso -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="bi bi-gear me-2"></i>
+                    Tipo de Proceso
+                </h4>
+                
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="inclusion" name="tipoProceso" value="Inclusión" 
+                               @onchange="@((ChangeEventArgs e) => inclusionData.TipoProceso = e.Value?.ToString())" 
+                               checked="@(inclusionData.TipoProceso == "Inclusión")">
+                        <label for="inclusion" class="radio-label">
+                            <div class="radio-custom"></div>
+                            <span>Inclusión</span>
+                        </label>
+                    </div>
+                    
+                    <div class="radio-item">
+                        <input type="radio" id="renovacion" name="tipoProceso" value="Renovación" 
+                               @onchange="@((ChangeEventArgs e) => inclusionData.TipoProceso = e.Value?.ToString())"
+                               checked="@(inclusionData.TipoProceso == "Renovación")">
+                        <label for="renovacion" class="radio-label">
+                            <div class="radio-custom"></div>
+                            <span>Renovación</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Póliza -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Información de Póliza
+                </h4>
+                
+                <div class="form-row">
+                    <div class="form-floating">
+                        <select class="form-control" id="poliza" @bind="inclusionData.PolizaId" required>
+                            <option value="">Seleccione una póliza *</option>
+                            <option value="1">Póliza Vida Individual</option>
+                            <option value="2">Póliza Salud Familiar</option>
+                            <option value="3">Póliza Accidentes Personales</option>
+                            <option value="4">Póliza Gastos Médicos</option>
+                        </select>
+                        <label for="poliza">Póliza *</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de contacto -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="bi bi-envelope me-2"></i>
+                    Información de Contacto
+                </h4>
+                
+                <div class="form-row">
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" placeholder="Email" 
+                               @bind="inclusionData.Email" required>
+                        <label for="email">Correo Electrónico *</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="sede" placeholder="Sede" 
+                               @bind="inclusionData.Sede">
+                        <label for="sede">Sede</label>
+                    </div>
+                    <small class="form-help">Este valor se obtiene del detalle de la póliza</small>
+                </div>
+            </div>
+
+            <!-- Fecha retroactiva -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="bi bi-calendar me-2"></i>
+                    Fecha Retroactiva
+                </h4>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="fechaRetroactiva" 
+                               @onchange="@((ChangeEventArgs e) => inclusionData.ActivarFechaRetroactiva = (bool)e.Value!)"
+                               checked="@inclusionData.ActivarFechaRetroactiva">
+                        <label for="fechaRetroactiva" class="checkbox-label">
+                            <div class="checkbox-custom"></div>
+                            <span>Activar fecha retroactiva</span>
+                        </label>
+                    </div>
+                </div>
+                
+                @if (inclusionData.ActivarFechaRetroactiva)
+                {
+                    <div class="form-row">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="fechaRetro" 
+                                   @bind="inclusionData.FechaRetroactiva">
+                            <label for="fechaRetro">Fecha Retroactiva</label>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Tipo de archivo -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="bi bi-file-earmark me-2"></i>
+                    Documentos
+                </h4>
+                
+                <div class="download-template">
+                    <a href="#" class="template-link" @onclick="DescargarPlantilla">
+                        <i class="bi bi-download me-1"></i>
+                        Descargar Plantilla
+                    </a>
+                </div>
+                
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="unido" name="tipoArchivo" value="UNIDO" 
+                               @onchange="@((ChangeEventArgs e) => inclusionData.TipoArchivo = e.Value?.ToString())"
+                               checked="@(inclusionData.TipoArchivo == "UNIDO")">
+                        <label for="unido" class="radio-label">
+                            <div class="radio-custom"></div>
+                            <span>UNIDO</span>
+                        </label>
+                    </div>
+                    
+                    <div class="radio-item">
+                        <input type="radio" id="individual" name="tipoArchivo" value="INDIVIDUAL" 
+                               @onchange="@((ChangeEventArgs e) => inclusionData.TipoArchivo = e.Value?.ToString())"
+                               checked="@(inclusionData.TipoArchivo == "INDIVIDUAL")">
+                        <label for="individual" class="radio-label">
+                            <div class="radio-custom"></div>
+                            <span>INDIVIDUAL</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="file-upload">
+                    <input type="file" id="archivo" class="file-input" 
+                           @onchange="SeleccionarArchivo" accept=".xlsx,.xls,.csv">
+                    <label for="archivo" class="file-label">
+                        <i class="bi bi-cloud-upload me-2"></i>
+                        Seleccionar archivo
+                    </label>
+                    <div class="file-info">
+                        @if (string.IsNullOrEmpty(inclusionData.NombreArchivo))
+                        {
+                            <span class="no-file">Ningún archivo seleccionado</span>
+                        }
+                        else
+                        {
+                            <span class="file-selected">
+                                <i class="bi bi-file-earmark-check me-1"></i>
+                                @inclusionData.NombreArchivo
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje de campos obligatorios -->
+            <div class="required-fields">
+                <small>* Campos obligatorios</small>
+            </div>
+
+            <!-- Botón de procesar -->
+            <div class="submit-section">
+                <button type="submit" class="btn-submit" disabled="@isProcessing">
+                    @if (isProcessing)
+                    {
+                        <span class="loading">  Procesando...</span>
+                      
+                    }
+                    else
+                    {
+                        < i class= "bi bi-check-circle me-2" >PROCESAR</ i >
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Mensaje de éxito/error -->
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert @GetAlertClass()">
+            <div class="alert-content">
+                <i class="bi @GetAlertIcon() me-2"></i>
+                @mensaje
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isProcessing = false;
+    private string mensaje = string.Empty;
+    private InclusionData inclusionData = new();
+
+    private class InclusionData
+    {
+        public string Nombres { get; set; } = "Juan Perez";
+        public string RUC { get; set; } = "01724568512";
+        public string TipoProceso { get; set; } = "Inclusión";
+        public string PolizaId { get; set; } = string.Empty;
+        public string Email { get; set; } = "juanperez@gmail.com";
+        public string Sede { get; set; } = string.Empty;
+        public bool ActivarFechaRetroactiva { get; set; } = false;
+        public DateTime? FechaRetroactiva { get; set; }
+        public string TipoArchivo { get; set; } = "UNIDO";
+        public string NombreArchivo { get; set; } = string.Empty;
+    }
+
+    private void SeleccionarArchivo(ChangeEventArgs e)
+    {
+        // Aquí se manejaría la selección del archivo
+        inclusionData.NombreArchivo = "archivo_seleccionado.xlsx";
+        StateHasChanged();
+    }
+
+    private void DescargarPlantilla()
+    {
+        // Lógica para descargar la plantilla
+        mensaje = "Descargando plantilla...";
+        StateHasChanged();
+        
+        // Simular descarga
+        Task.Delay(2000).ContinueWith(_ => {
+            mensaje = "Plantilla descargada exitosamente";
+            StateHasChanged();
+        });
+    }
+
+    private async Task ProcesarInclusion()
+    {
+        isProcessing = true;
+        mensaje = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            // Simular procesamiento
+            await Task.Delay(3000);
+            
+            // Validaciones básicas
+            if (string.IsNullOrEmpty(inclusionData.PolizaId))
+            {
+                mensaje = "Debe seleccionar una póliza";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(inclusionData.NombreArchivo))
+            {
+                mensaje = "Debe seleccionar un archivo";
+                return;
+            }
+
+            mensaje = "Inclusión procesada exitosamente";
+            
+            // Limpiar formulario después del éxito
+            await Task.Delay(2000);
+            inclusionData = new();
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al procesar: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetAlertClass()
+    {
+        return mensaje.Contains("exitosamente") ? "alert-success" : "alert-danger";
+    }
+
+    private string GetAlertIcon()
+    {
+        return mensaje.Contains("exitosamente") ? "bi-check-circle" : "bi-exclamation-triangle";
+    }
+}

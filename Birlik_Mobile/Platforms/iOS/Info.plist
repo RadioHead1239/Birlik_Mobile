@@ -19,6 +19,8 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>Esta app usa notificaciones para recordarte tus pólizas y pagos.</string>
     <key>UISupportedInterfaceOrientations~ipad</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>

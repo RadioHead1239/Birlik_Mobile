@@ -184,7 +184,7 @@
             };
 
             var result = await ApiService.LoginAsync(request);
-            
+        
             if (!result.IsSuccess || result.Data == null)
             {
                 mensaje = "Usuario o contraseña incorrectos. Verifica tus credenciales.";
@@ -196,7 +196,6 @@
 
             var data = result.Data;
 
-            // ✅ Guardamos el usuario en AuthService (memoria + SQLite)
             await AuthService.SetUserAsync(data.Usuario);
 
             mensaje = $"¡Bienvenido, {data.Usuario.Usuario}!";
@@ -204,11 +203,25 @@
             isLoading = false;
             StateHasChanged();
 
-            // Espera breve para mostrar mensaje de bienvenida
-            await Task.Delay(1500);
+            await Task.Delay(1000);
 
-            // ✅ Redirigimos a /home (donde se elegirá el dashboard según rol)
-            NavManager.NavigateTo("/home", forceLoad: true);
+            var rol = data.Usuario.Rol;
+
+            switch (rol)
+            {
+                case "Cliente":
+                    NavManager.NavigateTo("/cliente/dashboard", forceLoad: true);
+                    break;
+                case "Ejecutivo":
+                    NavManager.NavigateTo("/ejecutivo/dashboard", forceLoad: true);
+                    break;
+                case "Gerente":
+                    NavManager.NavigateTo("/gerente/dashboard", forceLoad: true);
+                    break;
+                default:
+                    NavManager.NavigateTo("/home", forceLoad: true);
+                    break;
+            }
         }
         catch (Exception ex)
         {
@@ -219,4 +232,5 @@
             StateHasChanged();
         }
     }
+
 }

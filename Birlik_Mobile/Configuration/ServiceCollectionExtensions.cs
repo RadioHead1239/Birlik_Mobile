@@ -14,6 +14,7 @@ namespace Birlik_Mobile.Configuration
         /// </summary>
         public static IServiceCollection AddBirlikServices(this IServiceCollection services)
         {
+            // HttpClient simple con header x-api-key
             services.AddScoped(sp =>
             {
                 var client = new HttpClient
@@ -29,20 +30,15 @@ namespace Birlik_Mobile.Configuration
                 return client;
             });
 
+            // Servicios de dominio
             services.AddScoped<ApiService>();
+            services.AddSingleton<NotificationService>();
 
+            // Base local y auth como singletons (una única instancia durante el ciclo de vida de la app)
+            services.AddSingleton<LocalDatabase>();   // usa el ctor sin parámetros que ya tienes
             services.AddSingleton<AuthService>();
 
-         
-
-            services.AddSingleton<LocalDatabase>(sp =>
-            {
-                string dbPath = Path.Combine(FileSystem.AppDataDirectory, "birlik_session.db3");
-                return new LocalDatabase(dbPath);
-            });
-
-            services.AddSingleton<AuthService>();
-
+            // (Descomentarlos cuando los implementes)
             // services.AddScoped<ClienteService>();
             // services.AddScoped<PolizaService>();
             // services.AddScoped<FacturaService>();

@@ -1,19 +1,17 @@
-﻿@inherits LayoutComponentBase
+﻿@using Birlik_Mobile.Components.Layout
+@inherits LayoutComponentBase
 @inject Birlik_Mobile.Services.AuthService AuthService
 @inject NavigationManager NavManager
 
 <div class="app-container">
-    <!-- Barra superior mejorada -->
+    <!-- Barra superior -->
     <header class="app-header">
         <div class="header-left">
             <button class="menu-btn" @onclick="ToggleMenu">
                 <i class="bi @(menuOpen ? "bi-x-lg" : "bi-list")"></i>
             </button>
             <div class="header-brand">
-                <h1 class="app-title">
-                    <i class="bi bi-shield-check me-2"></i>
-                    Birlik
-                </h1>
+                <h1 class="app-title"><i class="bi bi-shield-check me-2"></i>Birlik</h1>
                 <p class="app-subtitle">Corredor de Seguros</p>
             </div>
         </div>
@@ -22,9 +20,7 @@
             @if (AuthService.CurrentUser != null)
             {
                 <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="bi bi-person-circle"></i>
-                    </div>
+                    <div class="user-avatar"><i class="bi bi-person-circle"></i></div>
                     <div class="user-details">
                         <span class="user-name">@AuthService.CurrentUser.Usuario</span>
                         <span class="user-role">@AuthService.CurrentUser.Rol</span>
@@ -37,7 +33,7 @@
     <!-- Overlay del drawer -->
     <div class="drawer-overlay @(menuOpen ? "show" : "")" @onclick="CloseMenu"></div>
 
-    <!-- Menú lateral mejorado -->
+    <!-- Menú lateral -->
     <aside class="drawer @(menuOpen ? "open" : "")">
         <NavMenu IsOpen="menuOpen" OnClose="CloseMenu" />
     </aside>
@@ -47,24 +43,23 @@
         @Body
     </main>
 
-    <!-- Botón flotante de emergencia (solo para clientes) -->
-    @if (AuthService.CurrentUser?.Rol?.ToLower() == "cliente")
+    <!-- Botón de emergencia solo para clientes -->
+    @if (AuthService.CurrentUser?.Rol?.ToLowerInvariant() == "Cliente")
     {
-        <button class="emergency-fab" @onclick="@(() => NavManager.NavigateTo("/cliente/emergencia"))">
+        <button class="emergency-fab" @onclick="GoToEmergencia">
             <i class="bi bi-exclamation-triangle"></i>
         </button>
     }
-
-    <!-- Notificaciones toast -->
-    <div class="toast-container">
-        <!-- Aquí se pueden agregar notificaciones toast dinámicas -->
-    </div>
 </div>
-
 
 @code {
     private bool menuOpen;
 
     private void ToggleMenu() => menuOpen = !menuOpen;
     private void CloseMenu() => menuOpen = false;
+
+    private void GoToEmergencia()
+    {
+        NavManager.NavigateTo("/cliente/emergencia");
+    }
 }

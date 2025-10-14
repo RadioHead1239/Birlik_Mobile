@@ -1,0 +1,150 @@
+@page "/ejecutivo/dashboard"
+@inject NavigationManager Nav
+@inject Birlik_Mobile.Services.AuthService AuthService
+
+<div class="dashboard-container">
+    <div class="welcome-header">
+        <div class="welcome-content">
+            <div class="user-greeting">
+                <h1 class="greeting-text">
+                    ¡Hola, <span class="text-gradient">@(AuthService.CurrentUser?.Usuario ?? "Ejecutivo")</span>!
+                </h1>
+                <p class="greeting-subtitle">Gestiona tu portafolio de clientes y pólizas</p>
+            </div>
+            <div class="user-avatar">
+                <i class="bi bi-person-badge"></i>
+            </div>
+        </div>
+        
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">24</span>
+                    <span class="stat-label">Pólizas Activas</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">18</span>
+                    <span class="stat-label">Clientes</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">₡2.4M</span>
+                    <span class="stat-label">Producción</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-actions">
+        <h3 class="section-title">
+            <i class="bi bi-grid-3x3-gap me-2"></i>
+            Gestión Principal
+        </h3>
+        
+        <div class="actions-grid">
+            <a href="/ejecutivo/polizas" class="action-card">
+                <div class="action-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h4 class="action-title">Pólizas</h4>
+                <p class="action-description">Gestiona las pólizas de tus clientes</p>
+                <div class="action-badge">Próximamente</div>
+            </a>
+            
+            <a href="/ejecutivo/inclusiones" class="action-card available">
+                <div class="action-icon">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <h4 class="action-title">Inclusiones</h4>
+                <p class="action-description">Procesa nuevas inclusiones</p>
+                <div class="action-badge available">Disponible</div>
+            </a>
+            
+            <a href="/ejecutivo/clientes" class="action-card">
+                <div class="action-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h4 class="action-title">Clientes</h4>
+                <p class="action-description">Administra tu cartera de clientes</p>
+                <div class="action-badge">Próximamente</div>
+            </a>
+            
+            <a href="/ejecutivo/siniestros" class="action-card">
+                <div class="action-icon">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <h4 class="action-title">Siniestros</h4>
+                <p class="action-description">Gestiona reportes de siniestros</p>
+                <div class="action-badge">Próximamente</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="quick-access">
+        <h3 class="section-title">
+            <i class="bi bi-lightning me-2"></i>
+            Acceso Rápido
+        </h3>
+        
+        <div class="access-grid">
+            <a href="/ejecutivo/inclusiones" class="access-btn">
+                <i class="bi bi-person-plus access-icon"></i>
+                Nueva Inclusión
+            </a>
+            <a href="#" class="access-btn disabled">
+                <i class="bi bi-search access-icon"></i>
+                Buscar Cliente
+            </a>
+            <a href="#" class="access-btn disabled">
+                <i class="bi bi-file-earmark-text access-icon"></i>
+                Reportes
+            </a>
+            <a href="#" class="access-btn disabled">
+                <i class="bi bi-calendar-check access-icon"></i>
+                Calendario
+            </a>
+        </div>
+    </div>
+
+    <div class="info-cards">
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+                <h5 class="card-title">Información Importante</h5>
+            </div>
+            <p class="card-content">
+                Recuerda que solo la sección de <strong>Inclusiones</strong> está disponible actualmente. 
+                Las demás funcionalidades estarán disponibles próximamente.
+            </p>
+        </div>
+        
+        <div class="info-card success">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <h5 class="card-title">Meta del Mes</h5>
+            </div>
+            <p class="card-content">
+                Has alcanzado el <strong>85%</strong> de tu meta mensual. ¡Excelente trabajo!
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+}

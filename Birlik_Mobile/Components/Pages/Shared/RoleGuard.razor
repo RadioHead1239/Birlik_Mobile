@@ -1,4 +1,5 @@
 ﻿@inject Birlik_Mobile.Services.AuthService AuthService
+@using Birlik_Mobile.Components.Pages
 @inject NavigationManager NavManager
 
 @if (AuthService.CurrentUser?.Rol?.Equals(AllowedRole, StringComparison.OrdinalIgnoreCase) ?? false)

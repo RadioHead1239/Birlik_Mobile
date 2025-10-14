@@ -1,8 +1,11 @@
 ﻿@page "/cliente/dashboard"
+@using Birlik_Mobile.Services
 @inject NavigationManager Nav
-@inject Birlik_Mobile.Services.AuthService AuthService
+@inject AuthService AuthService
+@inject NotificationService NotificationService
 
 <div class="dashboard-container">
+
     <!-- Header con saludo personalizado -->
     <div class="welcome-header">
         <div class="welcome-content">
@@ -16,7 +19,7 @@
                 <i class="bi bi-person-circle"></i>
             </div>
         </div>
-        
+
         <!-- Indicadores rápidos -->
         <div class="quick-stats">
             <div class="stat-card">
@@ -28,6 +31,7 @@
                     <span class="stat-label">Pólizas Activas</span>
                 </div>
             </div>
+
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="bi bi-calendar-check"></i>
@@ -40,15 +44,24 @@
         </div>
     </div>
 
+    <!-- Botón de prueba para mostrar notificación -->
+    <div class="notification-test">
+        <button class="notify-btn" @onclick="ShowTestNotification">
+            <i class="bi bi-bell-fill"></i>
+            <span>Mostrar Notificación</span>
+        </button>
+    </div>
+
     <!-- Acciones principales -->
     <div class="main-actions">
         <h3 class="section-title">
             <i class="bi bi-grid-3x3-gap me-2"></i>
             Acciones Principales
         </h3>
-        
+
         <div class="actions-grid">
-            <div class="action-card" @onclick="@(()=>Nav.NavigateTo("/cliente/polizas"))">
+
+            <div class="action-card" @onclick='() => Nav.NavigateTo("/cliente/polizas")'>
                 <div class="action-icon polizas">
                     <i class="bi bi-shield-check"></i>
                 </div>
@@ -61,7 +74,7 @@
                 </div>
             </div>
 
-            <div class="action-card" @onclick="@(()=>Nav.NavigateTo("/cliente/facturas"))">
+            <div class="action-card" @onclick='() => Nav.NavigateTo("/cliente/facturas")'>
                 <div class="action-icon facturas">
                     <i class="bi bi-receipt"></i>
                 </div>
@@ -74,7 +87,7 @@
                 </div>
             </div>
 
-            <div class="action-card" @onclick="@(()=>Nav.NavigateTo("/cliente/datos"))">
+            <div class="action-card" @onclick='() => Nav.NavigateTo("/cliente/datos")'>
                 <div class="action-icon datos">
                     <i class="bi bi-person-lines-fill"></i>
                 </div>
@@ -87,7 +100,7 @@
                 </div>
             </div>
 
-            <div class="action-card emergency" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
+            <div class="action-card emergency" @onclick='() => Nav.NavigateTo("/cliente/emergencia")'>
                 <div class="action-icon emergency">
                     <i class="bi bi-exclamation-triangle"></i>
                 </div>
@@ -108,17 +121,19 @@
             <i class="bi bi-lightning me-2"></i>
             Acceso Rápido
         </h3>
-        
+
         <div class="quick-actions">
-            <button class="quick-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/polizas"))">
+            <button class="quick-btn" @onclick='() => Nav.NavigateTo("/cliente/polizas")'>
                 <i class="bi bi-shield-check"></i>
                 <span>Pólizas</span>
             </button>
-            <button class="quick-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/facturas"))">
+
+            <button class="quick-btn" @onclick='() => Nav.NavigateTo("/cliente/facturas")'>
                 <i class="bi bi-receipt"></i>
                 <span>Facturas</span>
             </button>
-            <button class="quick-btn emergency" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
+
+            <button class="quick-btn emergency" @onclick='() => Nav.NavigateTo("/cliente/emergencia")'>
                 <i class="bi bi-telephone"></i>
                 <span>SOS</span>
             </button>
@@ -137,7 +152,40 @@
             </div>
         </div>
     </div>
+
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Asegura que la sesión esté cargada
+        await AuthService.InitializeAsync();
+
+        // Mostrar notificación de bienvenida al cargar el dashboard
+        if (AuthService.CurrentUser != null)
+        {
+            await NotificationService.ShowNotificationAsync(
+                "Bienvenido de nuevo 👋",
+                $"Hola {AuthService.CurrentUser.Usuario}, accediste a tu panel de cliente."
+            );
+        }
+        else
+        {
+            await NotificationService.ShowNotificationAsync(
+                "Bienvenido a Birlik",
+                "Explora tus seguros y gestiona tus pólizas fácilmente."
+            );
+        }
+    }
+
+    private async Task ShowTestNotification()
+    {
+        await NotificationService.ShowNotificationAsync(
+            "⚠️ Póliza próxima a vencer",
+            "Tu póliza está por vencer. Por favor, revisa los detalles en la sección Mis Pólizas."
+        );
+    }
+}
 
 <style>
 .dashboard-container {
@@ -457,3 +505,4 @@
     }
 }
 </style>
+}

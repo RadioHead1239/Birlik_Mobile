@@ -1,29 +1,33 @@
 ﻿using Birlik_Mobile.Configuration;
 using Microsoft.Extensions.Logging;
+using Plugin.LocalNotification;
 
-namespace Birlik_Mobile;
-
-public static class MauiProgram
+namespace Birlik_Mobile
 {
-    public static MauiApp CreateMauiApp()
+    public static class MauiProgram
     {
-        var builder = MauiApp.CreateBuilder();
+        public static MauiApp CreateMauiApp()
+        {
+            var builder = MauiApp.CreateBuilder();
 
-        builder
-            .UseMauiApp<App>()
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-            });
+            builder
+                .UseMauiApp<App>()
+                .UseLocalNotification()
+                .ConfigureFonts(fonts =>
+                {
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                });
 
-        builder.Services.AddBirlikServices();
-
-        builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddBirlikServices();
+            builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-        builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
-        builder.Logging.AddDebug(); //LOGS
-        return builder.Build();
+
+            builder.Logging.AddDebug();
+
+            return builder.Build();
+        }
     }
 }

@@ -1,78 +1,30 @@
 ﻿@page "/home"
+@inject AuthService AuthService
 @inject NavigationManager NavManager
-@inject Birlik_Mobile.Services.AuthService AuthService
-
-<div class="loading-container">
-    <div class="loading-content">
-        <!-- Logo animado -->
-        <div class="logo-animation">
-            <div class="logo-circle">
-                <i class="bi bi-shield-check logo-icon"></i>
-            </div>
-        </div>
-        
-        <!-- Mensaje de bienvenida -->
-        <div class="welcome-message">
-            <h2 class="text-gradient mb-2">¡Bienvenido!</h2>
-            <p class="text-muted">Cargando tu panel de control...</p>
-        </div>
-        
-        <!-- Indicador de progreso -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
-            </div>
-            <p class="progress-text">Verificando acceso...</p>
-        </div>
-        
-        <!-- Información del usuario -->
-        @if (AuthService.CurrentUser != null)
-        {
-            <div class="user-info">
-                <div class="user-avatar">
-                    <i class="bi bi-person-circle"></i>
-                </div>
-                <div class="user-details">
-                    <p class="user-name">@AuthService.CurrentUser.Usuario</p>
-                    <span class="user-role">@AuthService.CurrentUser.Rol</span>
-                </div>
-            </div>
-        }
-    </div>
-</div>
-
 
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await AuthService.InitializeAsync(); // 🔹 Carga la sesión guardada
+        await AuthService.InitializeAsync();
 
-        var rol = AuthService.CurrentUser?.Rol?.ToLower();
+        var rol = AuthService.CurrentUser?.Rol?.ToLowerInvariant();
 
         if (string.IsNullOrEmpty(rol))
         {
-            // Pequeña pausa para mostrar la animación
-            await Task.Delay(2000);
-            NavManager.NavigateTo("/", forceLoad: true);
+            NavManager.NavigateTo("/login", true);
             return;
         }
 
-        // Pausa para mostrar la pantalla de carga
-        await Task.Delay(2500);
-
         switch (rol)
         {
+            case "cliente":
+                NavManager.NavigateTo("/cliente/dashboard", true);
+                break;
             case "ejecutivo":
-                NavManager.NavigateTo("/ejecutivo/dashboard", forceLoad: true);
+                NavManager.NavigateTo("/ejecutivo/dashboard", true);
                 break;
             case "gerente":
-                NavManager.NavigateTo("/gerente/dashboard", forceLoad: true);
-                break;
-            case "cliente":
-                NavManager.NavigateTo("/cliente/dashboard", forceLoad: true);
-                break;
-            default:
-                NavManager.NavigateTo("/", forceLoad: true);
+                NavManager.NavigateTo("/gerente/dashboard", true);
                 break;
         }
     }
