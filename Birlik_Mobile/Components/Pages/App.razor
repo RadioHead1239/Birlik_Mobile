@@ -1,8 +1,44 @@
-﻿<Router AppAssembly="@typeof(Birlik_Mobile.Components.Pages.App).Assembly">
+﻿@using Birlik_Mobile.Components.Layout
+@inject Birlik_Mobile.Services.AuthService AuthService
+@inject NavigationManager NavManager
+
+<Router AppAssembly="@typeof(Birlik_Mobile.Components.Pages.App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
     </Found>
     <NotFound>
         <p>Página no encontrada</p>
     </NotFound>
 </Router>
+
+@code {
+    private bool _redirected = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _redirected)
+            return;
+
+        _redirected = true;
+        await AuthService.InitializeAsync();
+
+        if (AuthService.CurrentUser == null)
+        {
+            // Redirige al login si no hay usuario
+            NavManager.NavigateTo("/login", forceLoad: true);
+            return;
+        }
+
+        var rol = AuthService.CurrentUser.Rol?.ToLowerInvariant() ?? "";
+        string destino = rol switch
+        {
+            "cliente" => "/cliente/dashboard",
+            "ejecutivo" => "/ejecutivo/dashboard",
+            "gerente" => "/gerente/dashboard",
+            _ => "/home"
+        };
+
+        NavManager.NavigateTo(destino, forceLoad: true);
+    }
+}
+

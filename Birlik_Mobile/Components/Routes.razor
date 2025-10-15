@@ -1,7 +1,4 @@
-﻿@inject Birlik_Mobile.Services.AuthService AuthService
-@inject NavigationManager NavManager
-
-<Router AppAssembly="@typeof(Birlik_Mobile.Components.Pages.App).Assembly">
+﻿<Router AppAssembly="@typeof(Birlik_Mobile.Components.Pages.App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
     </Found>
@@ -9,35 +6,3 @@
         <p>Página no encontrada</p>
     </NotFound>
 </Router>
-
-@code {
-    protected override void OnInitialized()
-    {
-        if (AuthService.CurrentUser == null)
-        {
-            Console.WriteLine("🔸 No hay sesión, yendo a /login");
-            NavManager.NavigateTo("/login", true);
-        }
-        else
-        {
-            var rol = AuthService.CurrentUser.Rol?.ToLowerInvariant();
-            Console.WriteLine($"🔹 Rol detectado: {rol}");
-
-            switch (rol)
-            {
-                case "cliente":
-                    NavManager.NavigateTo("/cliente/inicio", true);
-                    break;
-                case "ejecutivo":
-                    NavManager.NavigateTo("/ejecutivo/inicio", true);
-                    break;
-                case "gerente":
-                    NavManager.NavigateTo("/gerente/inicio", true);
-                    break;
-                default:
-                    NavManager.NavigateTo("/home", true);
-                    break;
-            }
-        }
-    }
-}
