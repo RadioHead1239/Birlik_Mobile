@@ -11,20 +11,20 @@
 
         if (string.IsNullOrEmpty(rol))
         {
-            NavManager.NavigateTo("/login", true);
+            NavManager.NavigateTo("/login");
             return;
         }
 
         switch (rol)
         {
             case "cliente":
-                NavManager.NavigateTo("/cliente/dashboard", true);
+                NavManager.NavigateTo("/cliente/dashboard");
                 break;
             case "ejecutivo":
-                NavManager.NavigateTo("/ejecutivo/dashboard", true);
+                NavManager.NavigateTo("/ejecutivo/dashboard");
                 break;
             case "gerente":
-                NavManager.NavigateTo("/gerente/dashboard", true);
+                NavManager.NavigateTo("/gerente/dashboard");
                 break;
         }
     }

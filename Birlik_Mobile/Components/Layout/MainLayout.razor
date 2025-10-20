@@ -44,7 +44,7 @@
     </main>
 
     <!-- Botón de emergencia solo para clientes -->
-    @if (AuthService.CurrentUser?.Rol?.ToLowerInvariant() == "Cliente")
+    @if (AuthService.CurrentUser?.Rol?.ToLowerInvariant() == "cliente")
     {
         <button class="emergency-fab" @onclick="GoToEmergencia">
             <i class="bi bi-exclamation-triangle"></i>

@@ -132,8 +132,8 @@
                         </NavLink>
                         break;
 
-                    case "ejecutivo":
-                        <NavLink href="/ejecutivo/dashboard" class="nav-item" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                    case "operativo":
+                        <NavLink href="/operativo/dashboard" class="nav-item" Match="NavLinkMatch.All" @onclick="CloseMenu">
                             <div class="nav-icon">
                                 <i class="bi bi-speedometer2"></i>
                             </div>
@@ -143,7 +143,7 @@
                             </div>
                         </NavLink>
                         
-                        <NavLink href="/ejecutivo/clientes" class="nav-item" @onclick="CloseMenu">
+                        <NavLink href="/operativo/clientes" class="nav-item" @onclick="CloseMenu">
                             <div class="nav-icon">
                                 <i class="bi bi-person-vcard"></i>
                             </div>
@@ -153,7 +153,7 @@
                             </div>
                         </NavLink>
                         
-                        <NavLink href="/ejecutivo/polizas" class="nav-item" @onclick="CloseMenu">
+                        <NavLink href="/operativo/polizas" class="nav-item" @onclick="CloseMenu">
                             <div class="nav-icon">
                                 <i class="bi bi-shield"></i>
                             </div>
@@ -163,7 +163,7 @@
                             </div>
                         </NavLink>
                         
-                        <NavLink href="/ejecutivo/produccion" class="nav-item" @onclick="CloseMenu">
+                        <NavLink href="/operativo/produccion" class="nav-item" @onclick="CloseMenu">
                             <div class="nav-icon">
                                 <i class="bi bi-bar-chart-line"></i>
                             </div>
@@ -223,6 +223,6 @@
     private async Task CerrarSesion()
     {
         await AuthService.LogoutAsync();
-        NavManager.NavigateTo("/", forceLoad: true);
+        NavManager.NavigateTo("/login");
     }
 }

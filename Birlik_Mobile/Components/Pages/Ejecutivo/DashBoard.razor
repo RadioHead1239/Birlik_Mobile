@@ -1,4 +1,4 @@
-@page "/ejecutivo/dashboard"
+@page "/operativo/dashboard"
 @inject NavigationManager Nav
 @inject Birlik_Mobile.Services.AuthService AuthService
 
@@ -7,7 +7,7 @@
         <div class="welcome-content">
             <div class="user-greeting">
                 <h1 class="greeting-text">
-                    ¡Hola, <span class="text-gradient">@(AuthService.CurrentUser?.Usuario ?? "Ejecutivo")</span>!
+                    ¡Hola, <span class="text-gradient">@(AuthService.CurrentUser?.Usuario ?? "Operativo")</span>!
                 </h1>
                 <p class="greeting-subtitle">Gestiona tu portafolio de clientes y pólizas</p>
             </div>
@@ -54,7 +54,7 @@
         </h3>
         
         <div class="actions-grid">
-            <a href="/ejecutivo/polizas" class="action-card">
+            <a href="/operativo/polizas" class="action-card">
                 <div class="action-icon">
                     <i class="bi bi-shield-check"></i>
                 </div>
@@ -63,7 +63,7 @@
                 <div class="action-badge">Próximamente</div>
             </a>
             
-            <a href="/ejecutivo/inclusiones" class="action-card available">
+            <a href="/operativo/inclusiones" class="action-card available">
                 <div class="action-icon">
                     <i class="bi bi-person-plus"></i>
                 </div>
@@ -72,7 +72,7 @@
                 <div class="action-badge available">Disponible</div>
             </a>
             
-            <a href="/ejecutivo/clientes" class="action-card">
+            <a href="/operativo/clientes" class="action-card">
                 <div class="action-icon">
                     <i class="bi bi-people"></i>
                 </div>
@@ -81,7 +81,7 @@
                 <div class="action-badge">Próximamente</div>
             </a>
             
-            <a href="/ejecutivo/siniestros" class="action-card">
+            <a href="/operativo/siniestros" class="action-card">
                 <div class="action-icon">
                     <i class="bi bi-exclamation-triangle"></i>
                 </div>
@@ -99,7 +99,7 @@
         </h3>
         
         <div class="access-grid">
-            <a href="/ejecutivo/inclusiones" class="access-btn">
+            <a href="/operativo/inclusiones" class="access-btn">
                 <i class="bi bi-person-plus access-icon"></i>
                 Nueva Inclusión
             </a>

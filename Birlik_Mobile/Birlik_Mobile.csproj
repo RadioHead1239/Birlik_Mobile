@@ -73,7 +73,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AndroidResource Remove="Platforms\Android\Resources\drawable\Birlik_Icono.png" />
+      <AndroidResource Remove="Platforms\Android\Resources\drawable\birlik_icono.png" />
     </ItemGroup>
 
     <ItemGroup>

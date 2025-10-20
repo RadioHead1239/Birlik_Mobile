@@ -10,7 +10,7 @@ namespace Birlik_Mobile.Helpers
     {
 #if DEBUG
         //  desarrollo
-        public const string BaseUrl = "http://192.168.18.52:5277/api/";
+        public const string BaseUrl = "http://192.168.0.242:5277/api/";
 #else
         //  producción
         public const string BaseUrl = "https://birlikapi.azurewebsites.net/api/";

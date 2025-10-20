@@ -1,4 +1,5 @@
 ﻿@page "/"
+@page "/login"
 @inject Birlik_Mobile.Services.ApiService ApiService
 @inject Birlik_Mobile.Services.AuthService AuthService
 @inject NavigationManager NavManager
@@ -179,12 +180,12 @@
         {
             var request = new Birlik_Mobile.Models.Request.LoginRequestDTO
             {
-                Usuario = usuario.Trim(),
+                Correo = usuario.Trim(),
                 PasswordHash = password
             };
 
             var result = await ApiService.LoginAsync(request);
-        
+
             if (!result.IsSuccess || result.Data == null)
             {
                 mensaje = "Usuario o contraseña incorrectos. Verifica tus credenciales.";
@@ -194,32 +195,34 @@
                 return;
             }
 
-            var data = result.Data;
+            var user = result.Data;
 
-            await AuthService.SetUserAsync(data.Usuario);
+            await AuthService.SetUserAsync(new Birlik_Mobile.Models.Auth.UsuarioInfoDTO
+            {
+                Usuario = user.Correo,
+                Rol = user.Rol
+            });
 
-            mensaje = $"¡Bienvenido, {data.Usuario.Usuario}!";
+            mensaje = $"¡Bienvenido, {user.Nombre}!";
             hasError = false;
             isLoading = false;
             StateHasChanged();
 
             await Task.Delay(1000);
 
-            var rol = data.Usuario.Rol;
-
-            switch (rol)
+            switch (user.Rol)
             {
                 case "Cliente":
-                    NavManager.NavigateTo("/cliente/dashboard", forceLoad: true);
+                    NavManager.NavigateTo("/cliente/dashboard");
                     break;
                 case "Ejecutivo":
-                    NavManager.NavigateTo("/ejecutivo/dashboard", forceLoad: true);
+                    NavManager.NavigateTo("/operativo/dashboard");
                     break;
                 case "Gerente":
-                    NavManager.NavigateTo("/gerente/dashboard", forceLoad: true);
+                    NavManager.NavigateTo("/gerente/dashboard");
                     break;
                 default:
-                    NavManager.NavigateTo("/home", forceLoad: true);
+                    NavManager.NavigateTo("/home");
                     break;
             }
         }
@@ -232,5 +235,4 @@
             StateHasChanged();
         }
     }
-
 }

@@ -9,9 +9,10 @@ namespace Birlik_Mobile.Models.Response
 {
     public class LoginResponseDTO
     {
-        public string Message { get; set; }
-
-        public UsuarioInfoDTO Usuario { get; set; }
+        public string Correo { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Rol { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
     }
 
 }

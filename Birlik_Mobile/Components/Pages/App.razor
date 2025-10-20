@@ -24,8 +24,7 @@
 
         if (AuthService.CurrentUser == null)
         {
-            // Redirige al login si no hay usuario
-            NavManager.NavigateTo("/login", forceLoad: true);
+            NavManager.NavigateTo("/login");
             return;
         }
 
@@ -33,12 +32,12 @@
         string destino = rol switch
         {
             "cliente" => "/cliente/dashboard",
-            "ejecutivo" => "/ejecutivo/dashboard",
+            "operativo" => "/operativo/dashboard",
             "gerente" => "/gerente/dashboard",
             _ => "/home"
         };
 
-        NavManager.NavigateTo(destino, forceLoad: true);
+        NavManager.NavigateTo(destino);
     }
 }
 
