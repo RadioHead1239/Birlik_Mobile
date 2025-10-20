@@ -1,0 +1,366 @@
+@page "/cliente/poliza-detalle/{PolizaId:int}"
+@inject NavigationManager Nav
+
+<div class="poliza-detalle-container">
+    <!-- Header de la página -->
+    <div class="page-header">
+        <button class="back-btn" @onclick="@(() => Nav.NavigateTo("/cliente/polizas"))">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="page-title">Detalle de Póliza</h1>
+        <button class="share-btn" @onclick="CompartirPoliza">
+            <i class="bi bi-share"></i>
+        </button>
+    </div>
+
+    <!-- Información principal de la póliza -->
+    <div class="poliza-header-card">
+        <div class="poliza-icon">
+            <i class="bi bi-shield-check"></i>
+        </div>
+        <div class="poliza-info">
+            <h2 class="poliza-nombre">@GetPoliza().Nombre</h2>
+            <p class="poliza-numero">Póliza #@GetPoliza().Numero</p>
+            <div class="poliza-status">
+                <span class="status-badge @GetPolizaStatusClass(GetPoliza().Estado)">@GetPoliza().Estado</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalles de la póliza -->
+    <div class="details-section">
+        <h3 class="section-title">
+            <i class="bi bi-info-circle me-2"></i>
+            Información General
+        </h3>
+        
+        <div class="details-grid">
+            <div class="detail-item">
+                <span class="detail-label">Fecha de Inicio:</span>
+                <span class="detail-value">@GetPoliza().FechaInicio.ToString("dd/MM/yyyy")</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Fecha de Vencimiento:</span>
+                <span class="detail-value">@GetPoliza().FechaVencimiento.ToString("dd/MM/yyyy")</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Prima Mensual:</span>
+                <span class="detail-value amount">₡@GetPoliza().Prima.ToString("N2")</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Suma Asegurada:</span>
+                <span class="detail-value amount">₡@GetPoliza().SumaAsegurada.ToString("N0")</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Tipo de Póliza:</span>
+                <span class="detail-value">@GetPoliza().Tipo</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Forma de Pago:</span>
+                <span class="detail-value">@GetPoliza().FormaPago</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beneficiarios -->
+    <div class="beneficiarios-section">
+        <h3 class="section-title">
+            <i class="bi bi-people me-2"></i>
+            Beneficiarios
+        </h3>
+        
+        <div class="beneficiarios-list">
+            @foreach (var beneficiario in GetBeneficiarios())
+            {
+                <div class="beneficiario-card">
+                    <div class="beneficiario-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="beneficiorio-info">
+                        <h4 class="beneficiario-nombre">@beneficiario.Nombre</h4>
+                        <p class="beneficiario-cedula">Cédula: @beneficiario.Cedula</p>
+                        <p class="beneficiario-parentesco">@beneficiario.Parentesco</p>
+                    </div>
+                    <div class="beneficiario-porcentaje">
+                        <span class="porcentaje">@beneficiario.Porcentaje%</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Coberturas -->
+    <div class="coberturas-section">
+        <h3 class="section-title">
+            <i class="bi bi-shield-check me-2"></i>
+            Coberturas
+        </h3>
+        
+        <div class="coberturas-list">
+            @foreach (var cobertura in GetCoberturas())
+            {
+                <div class="cobertura-card">
+                    <div class="cobertura-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="cobertura-info">
+                        <h4 class="cobertura-nombre">@cobertura.Nombre</h4>
+                        <p class="cobertura-descripcion">@cobertura.Descripcion</p>
+                    </div>
+                    <div class="cobertura-monto">
+                        <span class="monto">₡@cobertura.Monto.ToString("N0")</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Historial de pagos -->
+    <div class="historial-section">
+        <h3 class="section-title">
+            <i class="bi bi-clock-history me-2"></i>
+            Historial de Pagos
+        </h3>
+        
+        <div class="historial-list">
+            @foreach (var pago in GetHistorialPagos())
+            {
+                <div class="pago-card @GetPagoStatusClass(pago.Estado)">
+                    <div class="pago-info">
+                        <h4 class="pago-fecha">@pago.Fecha.ToString("MMMM yyyy")</h4>
+                        <p class="pago-monto">₡@pago.Monto.ToString("N2")</p>
+                    </div>
+                    <div class="pago-status">
+                        <span class="status-badge @GetPagoStatusClass(pago.Estado)">@pago.Estado</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions-section">
+        <button class="action-btn primary" @onclick="DescargarPoliza">
+            <i class="bi bi-download"></i>
+            Descargar Póliza
+        </button>
+        
+        <button class="action-btn secondary" @onclick="ContactarEjecutivo">
+            <i class="bi bi-telephone"></i>
+            Contactar Ejecutivo
+        </button>
+        
+        <button class="action-btn warning" @onclick="SolicitarModificacion">
+            <i class="bi bi-pencil"></i>
+            Solicitar Modificación
+        </button>
+    </div>
+
+    @if (GetPoliza().Estado == "Próxima a Vencer")
+    {
+        <div class="renovacion-banner">
+            <div class="banner-content">
+                <i class="bi bi-exclamation-triangle"></i>
+                <div class="banner-text">
+                    <h4>Póliza próxima a vencer</h4>
+                    <p>Tu póliza vence en @GetDiasRestantes(GetPoliza().FechaVencimiento) días</p>
+                </div>
+            </div>
+            <button class="renovar-btn" @onclick="RenovarPoliza">
+                Renovar Ahora
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int PolizaId { get; set; }
+
+    private PolizaDetalleModel poliza = new()
+    {
+        Id = 1,
+        Nombre = "Vida Individual Premium",
+        Numero = "VLI-2024-001",
+        Estado = "Activa",
+        FechaInicio = DateTime.Now.AddMonths(-6),
+        FechaVencimiento = DateTime.Now.AddMonths(6),
+        Prima = 45000,
+        SumaAsegurada = 5000000,
+        Tipo = "Vida Individual",
+        FormaPago = "Mensual"
+    };
+
+
+
+    private PolizaDetalleModel GetPoliza()
+    {
+        return poliza;
+    }
+
+    private List<BeneficiarioInfo> GetBeneficiarios()
+    {
+        return new List<BeneficiarioInfo>
+        {
+            new BeneficiarioInfo
+            {
+                Nombre = "María Elena Rodríguez",
+                Cedula = "123456789",
+                Parentesco = "Cónyuge",
+                Porcentaje = 50
+            },
+            new BeneficiarioInfo
+            {
+                Nombre = "Juan Carlos Rodríguez",
+                Cedula = "987654321",
+                Parentesco = "Hijo",
+                Porcentaje = 50
+            }
+        };
+    }
+
+    private List<CoberturaInfo> GetCoberturas()
+    {
+        return new List<CoberturaInfo>
+        {
+            new CoberturaInfo
+            {
+                Nombre = "Muerte Natural",
+                Descripcion = "Cobertura por muerte por causas naturales",
+                Monto = 5000000
+            },
+            new CoberturaInfo
+            {
+                Nombre = "Muerte Accidental",
+                Descripcion = "Cobertura adicional por muerte accidental",
+                Monto = 2500000
+            },
+            new CoberturaInfo
+            {
+                Nombre = "Invalidez Total",
+                Descripcion = "Cobertura por invalidez total y permanente",
+                Monto = 1000000
+            }
+        };
+    }
+
+    private List<PagoInfo> GetHistorialPagos()
+    {
+        return new List<PagoInfo>
+        {
+            new PagoInfo
+            {
+                Fecha = DateTime.Now.AddMonths(-1),
+                Monto = 45000,
+                Estado = "Pagado"
+            },
+            new PagoInfo
+            {
+                Fecha = DateTime.Now.AddMonths(-2),
+                Monto = 45000,
+                Estado = "Pagado"
+            },
+            new PagoInfo
+            {
+                Fecha = DateTime.Now.AddMonths(-3),
+                Monto = 45000,
+                Estado = "Pagado"
+            }
+        };
+    }
+
+    private string GetPolizaStatusClass(string estado)
+    {
+        return estado switch
+        {
+            "Activa" => "active",
+            "Próxima a Vencer" => "warning",
+            "Vencida" => "expired",
+            _ => "inactive"
+        };
+    }
+
+    private string GetPagoStatusClass(string estado)
+    {
+        return estado switch
+        {
+            "Pagado" => "paid",
+            "Pendiente" => "pending",
+            "Vencido" => "overdue",
+            _ => "unknown"
+        };
+    }
+
+    private int GetDiasRestantes(DateTime fechaVencimiento)
+    {
+        return (fechaVencimiento - DateTime.Now).Days;
+    }
+
+    private void DescargarPoliza()
+    {
+        // TODO: Implementar descarga de póliza
+        Console.WriteLine("Descargando póliza...");
+    }
+
+    private void ContactarEjecutivo()
+    {
+        Nav.NavigateTo("/cliente/contactar-ejecutivo");
+    }
+
+    private void SolicitarModificacion()
+    {
+        Nav.NavigateTo("/cliente/solicitar-modificacion");
+    }
+
+    private void RenovarPoliza()
+    {
+        Nav.NavigateTo("/cliente/renovar-poliza");
+    }
+
+    private void CompartirPoliza()
+    {
+        // TODO: Implementar compartir póliza
+        Console.WriteLine("Compartiendo póliza...");
+    }
+
+    private class PolizaDetalleModel
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public string Numero { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaVencimiento { get; set; }
+        public decimal Prima { get; set; }
+        public decimal SumaAsegurada { get; set; }
+        public string Tipo { get; set; } = string.Empty;
+        public string FormaPago { get; set; } = string.Empty;
+    }
+
+
+    private class BeneficiarioInfo
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Cedula { get; set; } = string.Empty;
+        public string Parentesco { get; set; } = string.Empty;
+        public int Porcentaje { get; set; }
+    }
+
+    private class CoberturaInfo
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
+        public decimal Monto { get; set; }
+    }
+
+    private class PagoInfo
+    {
+        public DateTime Fecha { get; set; }
+        public decimal Monto { get; set; }
+        public string Estado { get; set; } = string.Empty;
+    }
+}

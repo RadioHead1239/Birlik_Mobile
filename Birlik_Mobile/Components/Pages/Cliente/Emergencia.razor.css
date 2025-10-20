@@ -1,37 +1,47 @@
-/* ===== PÁGINA DE EMERGENCIA ===== */
-.emergency-container {
+.emergencia-container {
     padding: 1rem;
-    background: var(--light-gray);
+    background: var(--light-bg);
     min-height: 100vh;
+    position: relative;
 }
 
-/* ===== HEADER DE PÁGINA ===== */
-.page-header {
+/* Header de emergencia */
+.emergency-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
 }
 
-.back-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: var(--primary-color);
-    color: var(--white);
+.back-btn, .sos-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     border: none;
+    background: white;
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
     box-shadow: var(--card-shadow);
+    transition: all 0.2s;
+}
+
+.sos-btn {
+    background: var(--danger-color);
+    color: white;
 }
 
 .back-btn:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--card-shadow-hover);
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.sos-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
 }
 
 .page-title {
@@ -40,351 +50,549 @@
     color: var(--primary-color);
     margin: 0;
     flex: 1;
-}
-
-/* ===== ESTADO DE EMERGENCIA ===== */
-.emergency-status {
-    background: var(--white);
-    border-radius: var(--border-radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--card-shadow);
     text-align: center;
-    border-left: 4px solid var(--success-color);
+    margin: 0 1rem;
 }
 
-.emergency-status.active {
-    border-left-color: var(--danger-color);
-    background: linear-gradient(135deg, #fef2f2, #ffffff);
+/* Sección SOS principal */
+.sos-main-section {
+    margin-bottom: 2rem;
 }
 
-.status-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: var(--success-color);
-    color: var(--white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.sos-card {
+    background: linear-gradient(135deg, #fee2e2, #ffffff);
+    border: 2px solid var(--danger-color);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+}
+
+.sos-icon {
+    font-size: 3rem;
+    color: var(--danger-color);
+    margin-bottom: 1rem;
+}
+
+.sos-title {
     font-size: 1.5rem;
-    margin: 0 auto 1rem auto;
-    animation: pulse 2s infinite;
-}
-
-.emergency-status.active .status-icon {
-    background: var(--danger-color);
-    animation: pulse-danger 1s infinite;
-}
-
-.status-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: 700;
+    color: var(--danger-color);
     margin-bottom: 0.5rem;
 }
 
-.status-description {
-    color: var(--dark-gray);
-    margin: 0;
-    font-size: 0.95rem;
-}
-
-/* ===== BOTÓN DE EMERGENCIA PRINCIPAL ===== */
-.emergency-button {
-    background: var(--white);
-    border-radius: var(--border-radius-xl);
-    padding: 2rem;
+.sos-description {
+    font-size: 1rem;
+    color: #6b7280;
     margin-bottom: 2rem;
-    box-shadow: var(--card-shadow-hover);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
 }
 
-.emergency-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
+.sos-main-btn {
     background: var(--danger-color);
-}
-
-.emergency-btn {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--danger-color), #dc2626);
-    color: var(--white);
+    color: white;
     border: none;
-    font-size: 1.5rem;
+    border-radius: 50px;
+    padding: 1.5rem 3rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
-    position: relative;
-    overflow: hidden;
-    animation: pulse-emergency 3s infinite;
-}
-
-.emergency-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 15px 40px rgba(239, 68, 68, 0.6);
-}
-
-.emergency-btn:active {
-    transform: scale(0.95);
-}
-
-.emergency-btn.processing {
-    animation: spin 2s linear infinite;
-    background: var(--warning-color);
-}
-
-.emergency-btn-text {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--danger-color);
-    margin: 0;
-}
-
-.emergency-btn-description {
-    font-size: 0.85rem;
-    color: var(--dark-gray);
-    margin: 0;
-}
-
-/* ===== INFORMACIÓN DE CONTACTO ===== */
-.contact-info {
-    background: var(--white);
-    border-radius: var(--border-radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--card-shadow);
-}
-
-.contact-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}
-
-.contact-icon {
-    width: 35px;
-    height: 35px;
-    border-radius: 8px;
-    background: var(--info-color);
-    color: var(--white);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-}
-
-.contact-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
-    color: #1f2937;
-}
-
-.contact-list {
-    display: grid;
     gap: 1rem;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--blue-50);
-    border-radius: 12px;
-    border: 1px solid var(--blue-100);
     transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
 }
 
-.contact-item:hover {
-    background: var(--blue-100);
+.sos-main-btn:hover {
+    background: #dc2626;
     transform: translateY(-2px);
-    box-shadow: var(--card-shadow);
+    box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6);
 }
 
-.contact-item-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: var(--primary-color);
-    color: var(--white);
+.sos-main-btn.active {
+    background: #16a34a;
+    animation: pulse 2s infinite;
+}
+
+.sos-main-btn.active:hover {
+    background: #15803d;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Opciones de contacto */
+.contact-options {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
 }
 
-.contact-details {
-    flex: 1;
-}
-
-.contact-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 0.25rem;
-}
-
-.contact-number {
-    font-size: 0.9rem;
-    color: var(--dark-gray);
-    font-family: 'Courier New', monospace;
-    background: var(--white);
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    display: inline-block;
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
 }
 
 .contact-btn {
-    background: var(--success-color);
-    color: var(--white);
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
 }
 
 .contact-btn:hover {
-    background: #059669;
-    transform: translateY(-1px);
-    box-shadow: var(--card-shadow);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* ===== INFORMACIÓN IMPORTANTE ===== */
-.emergency-info {
-    background: linear-gradient(135deg, #fef3c7, #ffffff);
-    border-radius: var(--border-radius-lg);
-    padding: 1.5rem;
-    box-shadow: var(--card-shadow);
-    border-left: 4px solid var(--warning-color);
+.contact-btn.emergency {
+    border-color: var(--danger-color);
+    background: linear-gradient(135deg, #fef2f2, #ffffff);
 }
 
-.info-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+.contact-btn.emergency:hover {
+    border-color: var(--danger-color);
+    background: linear-gradient(135deg, #fee2e2, #ffffff);
 }
 
-.info-icon {
-    width: 35px;
-    height: 35px;
-    border-radius: 8px;
-    background: var(--warning-color);
-    color: var(--white);
+.contact-btn.support {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, #eff6ff, #ffffff);
+}
+
+.contact-btn.support:hover {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, #dbeafe, #ffffff);
+}
+
+.contact-btn.whatsapp {
+    border-color: #25d366;
+    background: linear-gradient(135deg, #f0fdf4, #ffffff);
+}
+
+.contact-btn.whatsapp:hover {
+    border-color: #25d366;
+    background: linear-gradient(135deg, #dcfce7, #ffffff);
+}
+
+.contact-btn.email {
+    border-color: var(--info-color);
+    background: linear-gradient(135deg, #f0f9ff, #ffffff);
+}
+
+.contact-btn.email:hover {
+    border-color: var(--info-color);
+    background: linear-gradient(135deg, #e0f2fe, #ffffff);
+}
+
+.contact-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
+    color: white;
 }
 
-.info-title {
+.contact-btn.emergency .contact-icon {
+    background: var(--danger-color);
+}
+
+.contact-btn.support .contact-icon {
+    background: var(--primary-color);
+}
+
+.contact-btn.whatsapp .contact-icon {
+    background: #25d366;
+}
+
+.contact-btn.email .contact-icon {
+    background: var(--info-color);
+}
+
+.contact-info {
+    flex: 1;
+    text-align: left;
+}
+
+.contact-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.25rem 0;
+}
+
+.contact-info p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Comisarías cercanas */
+.comisarias-section {
+    margin-bottom: 2rem;
+}
+
+.map-container {
+    margin-bottom: 1.5rem;
+}
+
+.map-placeholder {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 2px dashed var(--info-color);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.map-placeholder:hover {
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    border-color: #0891b2;
+}
+
+.map-content i {
+    font-size: 3rem;
+    color: var(--info-color);
+    margin-bottom: 1rem;
+}
+
+.map-content h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--info-color);
+    margin-bottom: 0.5rem;
+}
+
+.map-content p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.map-btn {
+    background: var(--info-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.map-btn:hover {
+    background: #0891b2;
+    transform: translateY(-1px);
+}
+
+/* Lista de comisarías */
+.comisarias-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.comisaria-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.comisaria-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
+}
+
+.comisaria-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.comisaria-info {
+    flex: 1;
+}
+
+.comisaria-nombre {
     font-size: 1.1rem;
     font-weight: 600;
-    margin: 0;
     color: #1f2937;
+    margin: 0 0 0.25rem 0;
 }
 
-.info-content {
+.comisaria-direccion {
     font-size: 0.9rem;
-    color: var(--dark-gray);
-    line-height: 1.6;
+    color: #6b7280;
+    margin: 0 0 0.25rem 0;
+}
+
+.comisaria-distancia {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: 600;
     margin: 0;
 }
 
-/* ===== ANIMACIONES ===== */
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.05);
-        opacity: 0.8;
-    }
+.comisaria-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
-@keyframes pulse-danger {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 0.9;
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-    }
+.action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
 }
 
-@keyframes pulse-emergency {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
-    }
-    50% {
-        transform: scale(1.02);
-        box-shadow: 0 15px 40px rgba(239, 68, 68, 0.6);
-    }
+.action-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Información de emergencia */
+.emergency-info {
+    margin-bottom: 2rem;
 }
 
-/* ===== RESPONSIVE ===== */
+.info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+}
+
+.info-icon {
+    font-size: 2rem;
+    color: var(--info-color);
+    margin-top: 0.25rem;
+}
+
+.info-content h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+}
+
+.info-content ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.info-content li {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Modal de SOS */
+.sos-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.sos-modal {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.sos-modal-icon {
+    font-size: 4rem;
+    color: var(--danger-color);
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.sos-modal-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--danger-color);
+    margin-bottom: 0.5rem;
+}
+
+.sos-modal-content p {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.sos-timer {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--danger-color);
+    margin-bottom: 2rem;
+    font-family: 'Courier New', monospace;
+}
+
+.sos-cancel-btn {
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+.sos-cancel-btn:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .emergency-container {
+    .emergencia-container {
         padding: 0.75rem;
-    }
-    
-    .page-header {
-        margin-bottom: 1rem;
     }
     
     .page-title {
         font-size: 1.3rem;
+        margin: 0 0.5rem;
     }
     
-    .emergency-button {
+    .sos-card {
         padding: 1.5rem;
     }
     
-    .emergency-btn {
-        width: 120px;
-        height: 120px;
-        font-size: 1.25rem;
+    .sos-icon {
+        font-size: 2.5rem;
     }
     
-    .contact-info,
-    .emergency-info {
+    .sos-title {
+        font-size: 1.3rem;
+    }
+    
+    .sos-main-btn {
+        padding: 1.25rem 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .contact-btn {
         padding: 1rem;
     }
     
-    .contact-item {
+    .contact-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .map-placeholder {
+        padding: 1.5rem;
+    }
+    
+    .map-content i {
+        font-size: 2.5rem;
+    }
+    
+    .comisaria-card {
+        padding: 1rem;
+    }
+    
+    .comisaria-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .info-card {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .info-icon {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-btn {
         padding: 0.75rem;
     }
     
-    .contact-item-icon {
+    .comisaria-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .action-btn {
         width: 35px;
         height: 35px;
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 }

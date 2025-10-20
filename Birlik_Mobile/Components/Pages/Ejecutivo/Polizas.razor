@@ -1,145 +1,291 @@
-@page "/ejecutivo/polizas"
+@page "/operativo/polizas"
 @inject NavigationManager Nav
 
-<div class="placeholder-container">
-    <div class="placeholder-content">
-        <div class="placeholder-icon">
-            <i class="bi bi-shield-check"></i>
-        </div>
-        <h2 class="placeholder-title">Gestión de Pólizas</h2>
-        <p class="placeholder-description">
-            Esta funcionalidad estará disponible próximamente. Podrás gestionar todas las pólizas de tus clientes desde aquí.
-        </p>
-        <div class="placeholder-features">
-            <h4>Funcionalidades que incluirá:</h4>
-            <ul>
-                <li><i class="bi bi-check-circle"></i> Consulta de pólizas activas</li>
-                <li><i class="bi bi-check-circle"></i> Gestión de renovaciones</li>
-                <li><i class="bi bi-check-circle"></i> Seguimiento de vencimientos</li>
-                <li><i class="bi bi-check-circle"></i> Reportes de producción</li>
-            </ul>
-        </div>
-        <button class="btn-back" @onclick="@(() => Nav.NavigateTo("/ejecutivo/dashboard"))">
-            <i class="bi bi-arrow-left me-2"></i>
-            Volver al Dashboard
+<div class="polizas-container">
+    <!-- Header de la página -->
+    <div class="page-header">
+        <button class="back-btn" @onclick="@(() => Nav.NavigateTo("/operativo/dashboard"))">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="page-title">Gestión de Pólizas</h1>
+        <button class="add-btn" @onclick="AgregarPoliza">
+            <i class="bi bi-plus-lg"></i>
         </button>
     </div>
+
+    <!-- Estadísticas de pólizas -->
+    <div class="stats-section">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">@GetTotalPolizas()</span>
+                <span class="stat-label">Total Pólizas</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">₡@GetPrimaTotal().ToString("N0")</span>
+                <span class="stat-label">Prima Total</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-calendar-exclamation"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">@GetPolizasPorVencer()</span>
+                <span class="stat-label">Por Vencer</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="filters-section">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Buscar póliza o cliente..." @bind="searchTerm" @bind:event="oninput">
+        </div>
+        
+        <div class="filter-buttons">
+            <button class="filter-btn @(selectedFilter == "todas" ? "active" : "")" @onclick="@(() => selectedFilter = "todas")">
+                Todas
+            </button>
+            <button class="filter-btn @(selectedFilter == "activas" ? "active" : "")" @onclick="@(() => selectedFilter = "activas")">
+                Activas
+            </button>
+            <button class="filter-btn @(selectedFilter == "vencidas" ? "active" : "")" @onclick="@(() => selectedFilter = "vencidas")">
+                Vencidas
+            </button>
+            <button class="filter-btn @(selectedFilter == "porvencer" ? "active" : "")" @onclick="@(() => selectedFilter = "porvencer")">
+                Por Vencer
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista de pólizas -->
+    <div class="polizas-list">
+        @foreach (var poliza in GetFilteredPolizas())
+        {
+            <div class="poliza-card @GetPolizaStatusClass(poliza.Estado)" @onclick="@(() => VerDetallePoliza(poliza.Id))">
+                <div class="poliza-header">
+                    <div class="poliza-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="poliza-info">
+                        <h3 class="poliza-nombre">@poliza.Nombre</h3>
+                        <p class="poliza-numero">Póliza #@poliza.Numero</p>
+                        <p class="poliza-cliente">Cliente: @poliza.Cliente</p>
+                    </div>
+                    <div class="poliza-status">
+                        <span class="status-badge @GetPolizaStatusClass(poliza.Estado)">@poliza.Estado</span>
+                    </div>
+                </div>
+
+                <div class="poliza-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Vigencia:</span>
+                        <span class="detail-value">@poliza.FechaInicio.ToString("dd/MM/yyyy") - @poliza.FechaVencimiento.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Prima:</span>
+                        <span class="detail-value">₡@poliza.Prima.ToString("N2")</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Suma Asegurada:</span>
+                        <span class="detail-value">₡@poliza.SumaAsegurada.ToString("N0")</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Comisión:</span>
+                        <span class="detail-value">₡@poliza.Comision.ToString("N2")</span>
+                    </div>
+                </div>
+
+                <div class="poliza-actions">
+                    <button class="action-btn primary" @onclick="@(() => VerDetallePoliza(poliza.Id))" @onclick:stopPropagation="true">
+                        <i class="bi bi-eye"></i>
+                        Ver
+                    </button>
+                    <button class="action-btn secondary" @onclick="@(() => EditarPoliza(poliza.Id))" @onclick:stopPropagation="true">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </button>
+                    <button class="action-btn warning" @onclick="@(() => RenovarPoliza(poliza.Id))" @onclick:stopPropagation="true">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Renovar
+                    </button>
+                </div>
+
+                @if (poliza.Estado == "Por Vencer" && GetDiasRestantes(poliza.FechaVencimiento) <= 30)
+                {
+                    <div class="warning-banner">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Vence en @GetDiasRestantes(poliza.FechaVencimiento) días - Contactar cliente</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Botón flotante para nueva póliza -->
+    <button class="fab-btn" @onclick="AgregarPoliza">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+
+    <!-- Estado vacío -->
+    @if (!GetFilteredPolizas().Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-shield-x"></i>
+            </div>
+            <h3>No hay pólizas</h3>
+            <p>No se encontraron pólizas con los filtros seleccionados</p>
+            <button class="btn-primary" @onclick="@(() => selectedFilter = "todas")">
+                Ver Todas
+            </button>
+        </div>
+    }
 </div>
 
-<style>
-.placeholder-container {
-    padding: 2rem 1rem;
-    background: var(--light-gray);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+@code {
+    private string searchTerm = string.Empty;
+    private string selectedFilter = "todas";
 
-.placeholder-content {
-    background: var(--white);
-    border-radius: var(--border-radius-lg);
-    padding: 3rem 2rem;
-    text-align: center;
-    box-shadow: var(--card-shadow);
-    max-width: 500px;
-    width: 100%;
-}
+    private List<PolizaInfo> polizas = new()
+    {
+        new PolizaInfo
+        {
+            Id = 1,
+            Nombre = "Vida Individual Premium",
+            Numero = "VLI-2024-001",
+            Cliente = "María Elena Rodríguez",
+            Estado = "Activa",
+            FechaInicio = DateTime.Now.AddMonths(-6),
+            FechaVencimiento = DateTime.Now.AddMonths(6),
+            Prima = 45000,
+            SumaAsegurada = 5000000,
+            Comision = 4500
+        },
+        new PolizaInfo
+        {
+            Id = 2,
+            Nombre = "Salud Familiar",
+            Numero = "SF-2024-002",
+            Cliente = "Carlos Alberto Méndez",
+            Estado = "Por Vencer",
+            FechaInicio = DateTime.Now.AddMonths(-11),
+            FechaVencimiento = DateTime.Now.AddDays(15),
+            Prima = 85000,
+            SumaAsegurada = 3000000,
+            Comision = 8500
+        },
+        new PolizaInfo
+        {
+            Id = 3,
+            Nombre = "Accidentes Personales",
+            Numero = "AP-2024-003",
+            Cliente = "Ana Lucía Vargas",
+            Estado = "Vencida",
+            FechaInicio = DateTime.Now.AddMonths(-13),
+            FechaVencimiento = DateTime.Now.AddDays(-5),
+            Prima = 25000,
+            SumaAsegurada = 2000000,
+            Comision = 2500
+        },
+        new PolizaInfo
+        {
+            Id = 4,
+            Nombre = "Gastos Médicos",
+            Numero = "GM-2024-004",
+            Cliente = "Roberto Jiménez",
+            Estado = "Activa",
+            FechaInicio = DateTime.Now.AddMonths(-2),
+            FechaVencimiento = DateTime.Now.AddMonths(10),
+            Prima = 65000,
+            SumaAsegurada = 4000000,
+            Comision = 6500
+        }
+    };
 
-.placeholder-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--primary-gradient);
-    color: var(--white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    margin: 0 auto 1.5rem auto;
-}
+    private IEnumerable<PolizaInfo> GetFilteredPolizas()
+    {
+        var filtered = polizas.AsEnumerable();
 
-.placeholder-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            filtered = filtered.Where(p => 
+                p.Nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                p.Numero.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                p.Cliente.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+        }
 
-.placeholder-description {
-    color: var(--dark-gray);
-    margin-bottom: 2rem;
-    line-height: 1.6;
-}
-
-.placeholder-features {
-    text-align: left;
-    background: var(--blue-50);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.placeholder-features h4 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-size: 1rem;
-}
-
-.placeholder-features ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.placeholder-features li {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    color: var(--dark-gray);
-    font-size: 0.9rem;
-}
-
-.placeholder-features li i {
-    color: var(--success-color);
-}
-
-.btn-back {
-    background: var(--primary-color);
-    color: var(--white);
-    border: none;
-    border-radius: 12px;
-    padding: 0.75rem 2rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-}
-
-.btn-back:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--card-shadow);
-}
-
-@@media (max-width: 768px) {
-    .placeholder-container {
-        padding: 1rem;
+        return selectedFilter switch
+        {
+            "activas" => filtered.Where(p => p.Estado == "Activa"),
+            "vencidas" => filtered.Where(p => p.Estado == "Vencida"),
+            "porvencer" => filtered.Where(p => p.Estado == "Por Vencer"),
+            _ => filtered
+        };
     }
-    
-    .placeholder-content {
-        padding: 2rem 1.5rem;
+
+    private int GetTotalPolizas() => polizas.Count;
+    private decimal GetPrimaTotal() => polizas.Sum(p => p.Prima);
+    private int GetPolizasPorVencer() => polizas.Count(p => p.Estado == "Por Vencer");
+
+    private string GetPolizaStatusClass(string estado)
+    {
+        return estado switch
+        {
+            "Activa" => "active",
+            "Por Vencer" => "warning",
+            "Vencida" => "expired",
+            _ => "inactive"
+        };
     }
-    
-    .placeholder-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
+
+    private int GetDiasRestantes(DateTime fechaVencimiento)
+    {
+        return (fechaVencimiento - DateTime.Now).Days;
     }
-    
-    .placeholder-title {
-        font-size: 1.3rem;
+
+    private void VerDetallePoliza(int polizaId)
+    {
+        Nav.NavigateTo($"/operativo/poliza-detalle/{polizaId}");
+    }
+
+    private void EditarPoliza(int polizaId)
+    {
+        Nav.NavigateTo($"/operativo/editar-poliza/{polizaId}");
+    }
+
+    private void RenovarPoliza(int polizaId)
+    {
+        Nav.NavigateTo($"/operativo/renovar-poliza/{polizaId}");
+    }
+
+    private void AgregarPoliza()
+    {
+        Nav.NavigateTo("/operativo/agregar-poliza");
+    }
+
+    private class PolizaInfo
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public string Numero { get; set; } = string.Empty;
+        public string Cliente { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaVencimiento { get; set; }
+        public decimal Prima { get; set; }
+        public decimal SumaAsegurada { get; set; }
+        public decimal Comision { get; set; }
     }
 }
-</style>

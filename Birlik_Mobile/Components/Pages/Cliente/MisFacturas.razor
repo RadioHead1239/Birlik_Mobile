@@ -1,757 +1,257 @@
 ﻿@page "/cliente/facturas"
 @inject NavigationManager Nav
-@inject Birlik_Mobile.Services.AuthService AuthService
 
-<RoleGuard AllowedRole="Cliente">
-    <div class="facturas-container">
-        <!-- Header -->
-        <div class="page-header">
-            <button class="back-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
-                <i class="bi bi-arrow-left"></i>
-            </button>
-            <div class="header-content">
-                <h1 class="page-title">
-                    <i class="bi bi-receipt me-2"></i>
-                    Mis Facturas
-                </h1>
-                <p class="page-subtitle">Gestiona tus comprobantes de pago</p>
+<div class="facturas-container">
+    <!-- Header de la página -->
+    <div class="page-header">
+        <button class="back-btn" @onclick="@(() => Nav.NavigateTo("/cliente/dashboard"))">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="page-title">Mis Facturas</h1>
+        <button class="filter-btn" @onclick="ToggleFilterModal">
+            <i class="bi bi-funnel"></i>
+        </button>
+    </div>
+
+    <!-- Resumen de facturas -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <div class="summary-content">
+                <span class="summary-number">@GetTotalFacturas()</span>
+                <span class="summary-label">Total Facturas</span>
             </div>
         </div>
-
-        <!-- Resumen de facturas -->
-        <div class="facturas-summary">
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="bi bi-receipt"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>@facturas.Count</h3>
-                    <p>Facturas Totales</p>
-                </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="bi bi-currency-dollar"></i>
             </div>
-            <div class="summary-card">
-                <div class="summary-icon success">
-                    <i class="bi bi-check-circle"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>@facturas.Count(f => f.Estado == "Pagada")</h3>
-                    <p>Pagadas</p>
-                </div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-icon warning">
-                    <i class="bi bi-clock"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>@facturas.Count(f => f.Estado == "Pendiente")</h3>
-                    <p>Pendientes</p>
-                </div>
+            <div class="summary-content">
+                <span class="summary-number">₡@GetTotalMonto().ToString("N0")</span>
+                <span class="summary-label">Monto Total</span>
             </div>
         </div>
-
-        <!-- Filtros -->
-        <div class="filters-section">
-            <div class="filter-tabs">
-                <button class="filter-tab @(filtroActivo == "todas" ? "active" : "")" 
-                        @onclick="@(() => CambiarFiltro("todas"))">
-                    Todas
-                </button>
-                <button class="filter-tab @(filtroActivo == "pagadas" ? "active" : "")" 
-                        @onclick="@(() => CambiarFiltro("pagadas"))">
-                    Pagadas
-                </button>
-                <button class="filter-tab @(filtroActivo == "pendientes" ? "active" : "")" 
-                        @onclick="@(() => CambiarFiltro("pendientes"))">
-                    Pendientes
-                </button>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="bi bi-exclamation-circle"></i>
+            </div>
+            <div class="summary-content">
+                <span class="summary-number">@GetFacturasPendientes()</span>
+                <span class="summary-label">Pendientes</span>
             </div>
         </div>
+    </div>
 
-        <!-- Lista de facturas -->
-        <div class="facturas-list">
-            @foreach (var factura in ObtenerFacturasFiltradas())
-            {
-                <div class="factura-card @factura.Estado.ToLower()">
-                    <div class="factura-header">
-                        <div class="factura-info">
-                            <h4 class="factura-numero">Factura #@factura.Numero</h4>
-                            <span class="factura-concepto">@factura.Concepto</span>
-                        </div>
-                        <div class="factura-monto">
-                            <span class="monto">@factura.Monto.ToString("C")</span>
-                            <span class="estado-badge @factura.Estado.ToLower()">
-                                @factura.Estado
-                            </span>
-                        </div>
-                    </div>
+    <!-- Filtros rápidos -->
+    <div class="quick-filters">
+        <button class="quick-filter @(selectedFilter == "todas" ? "active" : "")" @onclick="@(() => selectedFilter = "todas")">
+            Todas
+        </button>
+        <button class="quick-filter @(selectedFilter == "pagadas" ? "active" : "")" @onclick="@(() => selectedFilter = "pagadas")">
+            Pagadas
+        </button>
+        <button class="quick-filter @(selectedFilter == "pendientes" ? "active" : "")" @onclick="@(() => selectedFilter = "pendientes")">
+            Pendientes
+        </button>
+        <button class="quick-filter @(selectedFilter == "vencidas" ? "active" : "")" @onclick="@(() => selectedFilter = "vencidas")">
+            Vencidas
+        </button>
+    </div>
 
-                    <div class="factura-details">
-                        <div class="detail-row">
-                            <i class="bi bi-calendar3"></i>
-                            <span>Fecha: @factura.FechaEmision.ToString("dd/MM/yyyy")</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-calendar-check"></i>
-                            <span>Vencimiento: @factura.FechaVencimiento.ToString("dd/MM/yyyy")</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-building"></i>
-                            <span>Póliza: @factura.NumeroPoliza</span>
-                        </div>
-                        @if (!string.IsNullOrEmpty(factura.MetodoPago))
-                        {
-                            <div class="detail-row">
-                                <i class="bi bi-credit-card"></i>
-                                <span>Método: @factura.MetodoPago</span>
-                            </div>
-                        }
-                    </div>
-
-                    <div class="factura-actions">
-                        <button class="action-btn primary" @onclick="@(() => VerDetalle(factura))">
-                            <i class="bi bi-eye"></i>
-                            Ver Detalle
-                        </button>
-                        <button class="action-btn secondary" @onclick="@(() => DescargarFactura(factura))">
-                            <i class="bi bi-download"></i>
-                            Descargar
-                        </button>
-                        @if (factura.Estado == "Pendiente")
-                        {
-                            <button class="action-btn warning" @onclick="@(() => PagarFactura(factura))">
-                                <i class="bi bi-credit-card"></i>
-                                Pagar
-                            </button>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-
-        <!-- Mensaje cuando no hay facturas -->
-        @if (!ObtenerFacturasFiltradas().Any())
+    <!-- Lista de facturas -->
+    <div class="facturas-list">
+        @foreach (var factura in GetFilteredFacturas())
         {
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="bi bi-receipt"></i>
+            <div class="factura-card @GetFacturaStatusClass(factura.Estado)" @onclick="@(() => VerDetalleFactura(factura.Id))">
+                <div class="factura-header">
+                    <div class="factura-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <div class="factura-info">
+                        <h3 class="factura-numero">Factura #@factura.Numero</h3>
+                        <p class="factura-poliza">Póliza: @factura.Poliza</p>
+                    </div>
+                    <div class="factura-status">
+                        <span class="status-badge @GetFacturaStatusClass(factura.Estado)">@factura.Estado</span>
+                    </div>
                 </div>
-                <h3>No hay facturas</h3>
-                <p>No se encontraron facturas con el filtro seleccionado.</p>
-                <button class="btn btn-primary" @onclick="@(() => CambiarFiltro("todas"))">
-                    Ver todas las facturas
-                </button>
-            </div>
-        }
 
-        <!-- Información adicional -->
-        <div class="info-section">
-            <div class="info-card">
-                <div class="info-header">
-                    <i class="bi bi-info-circle"></i>
-                    <h5>Información sobre Facturas</h5>
+                <div class="factura-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha Emisión:</span>
+                        <span class="detail-value">@factura.FechaEmision.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha Vencimiento:</span>
+                        <span class="detail-value">@factura.FechaVencimiento.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Monto:</span>
+                        <span class="detail-value amount">₡@factura.Monto.ToString("N2")</span>
+                    </div>
                 </div>
-                <div class="info-content">
-                    <ul>
-                        <li>Las facturas se generan automáticamente al realizar pagos</li>
-                        <li>Puedes descargar tus facturas en formato PDF</li>
-                        <li>Las facturas pendientes deben pagarse antes del vencimiento</li>
-                        <li>Conserva tus facturas para efectos tributarios</li>
-                    </ul>
+
+                <div class="factura-actions">
+                    <button class="action-btn primary" @onclick="@(() => DescargarFactura(factura.Id))" @onclick:stopPropagation="true">
+                        <i class="bi bi-download"></i>
+                        Descargar
+                    </button>
+                    <button class="action-btn secondary" @onclick="@(() => VerDetalleFactura(factura.Id))" @onclick:stopPropagation="true">
+                        <i class="bi bi-eye"></i>
+                        Ver Detalle
+                    </button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Acciones rápidas -->
-        <div class="quick-actions-section">
-            <h4>
-                <i class="bi bi-lightning me-2"></i>
-                Acciones Rápidas
-            </h4>
-            <div class="quick-actions">
-                <button class="quick-action-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
-                    <i class="bi bi-house"></i>
-                    <span>Inicio</span>
-                </button>
-                <button class="quick-action-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/polizas"))">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Pólizas</span>
-                </button>
-                <button class="quick-action-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/emergencia"))">
-                    <i class="bi bi-telephone"></i>
-                    <span>Emergencia</span>
-                </button>
-            </div>
-        </div>
-
-        @if (!string.IsNullOrEmpty(mensaje))
-        {
-            <div class="alert @GetAlertClass()">
-                <i class="bi @GetAlertIcon() me-2"></i>
-                @mensaje
+                @if (factura.Estado == "Vencida")
+                {
+                    <div class="warning-banner">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Factura vencida - Contacta a tu ejecutivo</span>
+                    </div>
+                }
+                else if (factura.Estado == "Pendiente" && GetDiasRestantes(factura.FechaVencimiento) <= 3)
+                {
+                    <div class="warning-banner warning">
+                        <i class="bi bi-clock"></i>
+                        <span>Vence en @GetDiasRestantes(factura.FechaVencimiento) días</span>
+                    </div>
+                }
             </div>
         }
     </div>
-</RoleGuard>
 
-<style>
-.facturas-container {
-    padding: 1rem;
-    background: var(--light-bg);
-    min-height: 100vh;
-}
+    <!-- Botón flotante para solicitar factura -->
+    <button class="fab-btn" @onclick="SolicitarFactura">
+        <i class="bi bi-plus-lg"></i>
+    </button>
 
-.page-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-}
-
-.back-btn {
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.back-btn:hover {
-    background: var(--primary-dark);
-    transform: scale(1.05);
-}
-
-.header-content {
-    flex: 1;
-}
-
-.page-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin: 0;
-}
-
-.page-subtitle {
-    color: #6b7280;
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.facturas-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.summary-card {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: var(--card-shadow);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.summary-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-}
-
-.summary-icon.success {
-    background: var(--success-color);
-}
-
-.summary-icon.warning {
-    background: var(--warning-color);
-}
-
-.summary-content h3 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-    color: #1f2937;
-}
-
-.summary-content p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 0.9rem;
-}
-
-.filters-section {
-    margin-bottom: 2rem;
-}
-
-.filter-tabs {
-    display: flex;
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 0.5rem;
-    box-shadow: var(--card-shadow);
-    gap: 0.5rem;
-}
-
-.filter-tab {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-    color: #6b7280;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-
-.filter-tab.active {
-    background: var(--primary-color);
-    color: white;
-}
-
-.filter-tab:hover:not(.active) {
-    background: #f3f4f6;
-}
-
-.facturas-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.factura-card {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--card-shadow);
-    border-left: 4px solid var(--primary-color);
-    transition: all 0.2s;
-}
-
-.factura-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.factura-card.pagada {
-    border-left-color: var(--success-color);
-}
-
-.factura-card.pendiente {
-    border-left-color: var(--warning-color);
-}
-
-.factura-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.factura-info {
-    flex: 1;
-}
-
-.factura-numero {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin: 0 0 0.25rem 0;
-    color: #1f2937;
-}
-
-.factura-concepto {
-    background: #f3f4f6;
-    color: #6b7280;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.factura-monto {
-    text-align: right;
-}
-
-.monto {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1f2937;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.estado-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.estado-badge.pagada {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success-color);
-}
-
-.estado-badge.pendiente {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning-color);
-}
-
-.factura-details {
-    margin-bottom: 1.5rem;
-}
-
-.detail-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-    color: #6b7280;
-    font-size: 0.9rem;
-}
-
-.detail-row i {
-    width: 16px;
-    color: var(--primary-color);
-}
-
-.factura-actions {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.action-btn {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.action-btn.primary {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.action-btn.primary:hover {
-    background: var(--primary-color);
-    color: white;
-}
-
-.action-btn.secondary {
-    border-color: var(--secondary-color);
-    color: var(--secondary-color);
-}
-
-.action-btn.secondary:hover {
-    background: var(--secondary-color);
-    color: white;
-}
-
-.action-btn.warning {
-    border-color: var(--warning-color);
-    color: var(--warning-color);
-}
-
-.action-btn.warning:hover {
-    background: var(--warning-color);
-    color: white;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-}
-
-.empty-icon {
-    font-size: 4rem;
-    color: #d1d5db;
-    margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-    color: #6b7280;
-    margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-    color: #9ca3af;
-    margin-bottom: 2rem;
-}
-
-.info-section {
-    margin-bottom: 2rem;
-}
-
-.info-card {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--card-shadow);
-}
-
-.info-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    color: var(--info-color);
-}
-
-.info-header i {
-    font-size: 1.5rem;
-}
-
-.info-header h5 {
-    margin: 0;
-    font-weight: 600;
-}
-
-.info-content ul {
-    margin: 0;
-    padding-left: 1.5rem;
-}
-
-.info-content li {
-    margin-bottom: 0.5rem;
-    color: #6b7280;
-    line-height: 1.5;
-}
-
-.quick-actions-section {
-    margin-bottom: 2rem;
-}
-
-.quick-actions-section h4 {
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-}
-
-.quick-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: space-around;
-}
-
-.quick-action-btn {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-width: 80px;
-}
-
-.quick-action-btn:hover {
-    border-color: var(--primary-color);
-    transform: translateY(-2px);
-}
-
-.quick-action-btn i {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-}
-
-.quick-action-btn span {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #374151;
-}
-
-/* Responsive */
-@@media (max-width: 768px) {
-    .facturas-container {
-        padding: 0.75rem;
+    <!-- Estado vacío -->
+    @if (!GetFilteredFacturas().Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <h3>No hay facturas</h3>
+            <p>No se encontraron facturas con los filtros seleccionados</p>
+            <button class="btn-primary" @onclick="@(() => selectedFilter = "todas")">
+                Ver Todas
+            </button>
+        </div>
     }
-    
-    .facturas-summary {
-        grid-template-columns: 1fr;
-    }
-    
-    .summary-card {
-        padding: 1rem;
-    }
-    
-    .factura-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .factura-monto {
-        text-align: left;
-    }
-    
-    .factura-actions {
-        justify-content: center;
-    }
-    
-    .action-btn {
-        flex: 1;
-        justify-content: center;
-    }
-    
-    .quick-actions {
-        gap: 0.5rem;
-    }
-    
-    .quick-action-btn {
-        padding: 0.75rem 0.5rem;
-        min-width: 70px;
-    }
-}
-</style>
+</div>
 
 @code {
-    private string filtroActivo = "todas";
-    private string mensaje = string.Empty;
+    private string selectedFilter = "todas";
+    private bool showFilterModal = false;
 
-    private List<FacturaModel> facturas = new()
+    private List<FacturaInfo> facturas = new()
     {
-        new FacturaModel
+        new FacturaInfo
         {
-            Numero = "000123",
-            Concepto = "Prima Seguro Vehicular",
-            Monto = 250.00m,
+            Id = 1,
+            Numero = "FAC-2024-001",
+            Poliza = "Vida Individual Premium",
             Estado = "Pagada",
-            FechaEmision = new DateTime(2024, 10, 5),
-            FechaVencimiento = new DateTime(2024, 11, 5),
-            NumeroPoliza = "001245",
-            MetodoPago = "Transferencia Bancaria"
+            FechaEmision = DateTime.Now.AddMonths(-1),
+            FechaVencimiento = DateTime.Now.AddMonths(-1).AddDays(15),
+            Monto = 45000
         },
-        new FacturaModel
+        new FacturaInfo
         {
-            Numero = "000124",
-            Concepto = "Prima Seguro Vida",
-            Monto = 180.00m,
+            Id = 2,
+            Numero = "FAC-2024-002",
+            Poliza = "Salud Familiar",
+            Estado = "Pendiente",
+            FechaEmision = DateTime.Now.AddDays(-10),
+            FechaVencimiento = DateTime.Now.AddDays(5),
+            Monto = 85000
+        },
+        new FacturaInfo
+        {
+            Id = 3,
+            Numero = "FAC-2024-003",
+            Poliza = "Accidentes Personales",
+            Estado = "Vencida",
+            FechaEmision = DateTime.Now.AddMonths(-2),
+            FechaVencimiento = DateTime.Now.AddDays(-5),
+            Monto = 25000
+        },
+        new FacturaInfo
+        {
+            Id = 4,
+            Numero = "FAC-2024-004",
+            Poliza = "Vida Individual Premium",
             Estado = "Pagada",
-            FechaEmision = new DateTime(2024, 9, 15),
-            FechaVencimiento = new DateTime(2024, 10, 15),
-            NumeroPoliza = "001246",
-            MetodoPago = "Tarjeta de Crédito"
-        },
-        new FacturaModel
-        {
-            Numero = "000125",
-            Concepto = "Prima Seguro Hogar",
-            Monto = 320.00m,
-            Estado = "Pendiente",
-            FechaEmision = new DateTime(2024, 11, 1),
-            FechaVencimiento = new DateTime(2024, 12, 1),
-            NumeroPoliza = "001247",
-            MetodoPago = ""
-        },
-        new FacturaModel
-        {
-            Numero = "000126",
-            Concepto = "Prima Seguro Salud",
-            Monto = 450.00m,
-            Estado = "Pendiente",
-            FechaEmision = new DateTime(2024, 11, 10),
-            FechaVencimiento = new DateTime(2024, 12, 10),
-            NumeroPoliza = "001248",
-            MetodoPago = ""
+            FechaEmision = DateTime.Now.AddMonths(-2),
+            FechaVencimiento = DateTime.Now.AddMonths(-2).AddDays(15),
+            Monto = 45000
         }
     };
 
-    private class FacturaModel
+    private IEnumerable<FacturaInfo> GetFilteredFacturas()
     {
-        public string Numero { get; set; } = string.Empty;
-        public string Concepto { get; set; } = string.Empty;
-        public decimal Monto { get; set; }
-        public string Estado { get; set; } = string.Empty;
-        public DateTime FechaEmision { get; set; }
-        public DateTime FechaVencimiento { get; set; }
-        public string NumeroPoliza { get; set; } = string.Empty;
-        public string MetodoPago { get; set; } = string.Empty;
-    }
-
-    private List<FacturaModel> ObtenerFacturasFiltradas()
-    {
-        return filtroActivo switch
+        return selectedFilter switch
         {
-            "pagadas" => facturas.Where(f => f.Estado == "Pagada").ToList(),
-            "pendientes" => facturas.Where(f => f.Estado == "Pendiente").ToList(),
-            _ => facturas.ToList()
+            "pagadas" => facturas.Where(f => f.Estado == "Pagada"),
+            "pendientes" => facturas.Where(f => f.Estado == "Pendiente"),
+            "vencidas" => facturas.Where(f => f.Estado == "Vencida"),
+            _ => facturas
         };
     }
 
-    private void CambiarFiltro(string filtro)
+    private int GetTotalFacturas() => facturas.Count;
+    private decimal GetTotalMonto() => facturas.Sum(f => f.Monto);
+    private int GetFacturasPendientes() => facturas.Count(f => f.Estado == "Pendiente" || f.Estado == "Vencida");
+
+    private string GetFacturaStatusClass(string estado)
     {
-        filtroActivo = filtro;
+        return estado switch
+        {
+            "Pagada" => "paid",
+            "Pendiente" => "pending",
+            "Vencida" => "overdue",
+            _ => "unknown"
+        };
     }
 
-    private void VerDetalle(FacturaModel factura)
+    private int GetDiasRestantes(DateTime fechaVencimiento)
     {
-        mensaje = $"Abriendo detalles de la factura #{factura.Numero}...";
-        // Aquí podrías navegar a una página de detalle o mostrar un modal
+        return (fechaVencimiento - DateTime.Now).Days;
     }
 
-    private void DescargarFactura(FacturaModel factura)
+    private void VerDetalleFactura(int facturaId)
     {
-        mensaje = $"Descargando factura #{factura.Numero}...";
-        // Aquí podrías implementar la descarga del PDF
+        Nav.NavigateTo($"/cliente/factura-detalle/{facturaId}");
     }
 
-    private void PagarFactura(FacturaModel factura)
+    private void DescargarFactura(int facturaId)
     {
-        mensaje = $"Iniciando proceso de pago para la factura #{factura.Numero}...";
-        // Aquí podrías navegar al proceso de pago
+        // TODO: Implementar descarga de factura
     }
 
-    private string GetAlertClass()
+    private void SolicitarFactura()
     {
-        if (mensaje.Contains("Descargando") || mensaje.Contains("pago"))
-            return "alert-success";
-        else if (mensaje.Contains("Error"))
-            return "alert-danger";
-        else
-            return "alert-info";
+        Nav.NavigateTo("/cliente/solicitar-factura");
     }
 
-    private string GetAlertIcon()
+    private void ToggleFilterModal()
     {
-        if (mensaje.Contains("Descargando") || mensaje.Contains("pago"))
-            return "bi-check-circle";
-        else if (mensaje.Contains("Error"))
-            return "bi-exclamation-triangle";
-        else
-            return "bi-info-circle";
+        showFilterModal = !showFilterModal;
+    }
+
+    private class FacturaInfo
+    {
+        public int Id { get; set; }
+        public string Numero { get; set; } = string.Empty;
+        public string Poliza { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
+        public DateTime FechaEmision { get; set; }
+        public DateTime FechaVencimiento { get; set; }
+        public decimal Monto { get; set; }
     }
 }

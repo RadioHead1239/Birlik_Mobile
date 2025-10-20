@@ -271,6 +271,7 @@
 @media (max-width: 768px) {
     .app-header {
         padding: 0.75rem 1rem;
+        min-height: 60px;
     }
     
     .app-title {
@@ -315,15 +316,38 @@
         top: 0.5rem;
         right: 0.5rem;
     }
+    
+    /* Mejorar botón de menú en móvil */
+    .menu-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+    }
+    
+    /* Asegurar que el header sea táctil */
+    .menu-btn, .user-info {
+        min-height: 44px;
+    }
 }
 
 @media (max-width: 480px) {
+    .app-header {
+        padding: 0.5rem 0.75rem;
+        min-height: 56px;
+    }
+    
     .header-brand {
         display: none;
     }
     
     .user-details {
         display: none;
+    }
+    
+    .user-info {
+        padding: 0.25rem;
+        min-width: 44px;
+        justify-content: center;
     }
     
     .drawer {
@@ -337,5 +361,105 @@
         font-size: 1.1rem;
         bottom: 1rem;
         right: 1rem;
+    }
+    
+    /* Optimizar botón de menú para pantallas pequeñas */
+    .menu-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    /* Ajustar contenedor de toast para pantallas pequeñas */
+    .toast-container {
+        top: 0.25rem;
+        right: 0.25rem;
+        left: 0.25rem;
+    }
+}
+
+/* ===== MEJORAS MÓVILES ADICIONALES ===== */
+@media (max-width: 768px) {
+    /* Mejorar la experiencia táctil del drawer */
+    .drawer {
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Optimizar overlay para móviles */
+    .drawer-overlay {
+        backdrop-filter: blur(2px);
+    }
+    
+    /* Mejorar la animación del botón de emergencia */
+    .emergency-fab {
+        animation-reset: none;
+        animation: pulse 3s infinite;
+    }
+    
+    /* Asegurar que el contenido principal no se desborde */
+    .app-content {
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Optimizar para pantallas muy pequeñas */
+    .drawer {
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Mejorar el botón de emergencia en pantallas pequeñas */
+    .emergency-fab {
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Ajustar el header para pantallas muy pequeñas */
+    .header-left {
+        gap: 0.5rem;
+    }
+    
+    .header-right {
+        min-width: auto;
+    }
+}
+
+/* ===== ACCESIBILIDAD MÓVIL ===== */
+@media (max-width: 768px) {
+    /* Mejorar contraste en móviles */
+    .menu-btn {
+        color: var(--primary-dark);
+    }
+    
+    .menu-btn:hover {
+        background: rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Asegurar que los elementos sean accesibles por teclado */
+    .menu-btn:focus,
+    .emergency-fab:focus,
+    .user-info:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+}
+
+/* ===== ORIENTACIÓN LANDSCAPE ===== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .app-header {
+        padding: 0.5rem 1rem;
+        min-height: 50px;
+    }
+    
+    .app-title {
+        font-size: 1.2rem;
+    }
+    
+    .emergency-fab {
+        bottom: 1rem;
+        right: 1rem;
+        width: 45px;
+        height: 45px;
     }
 }

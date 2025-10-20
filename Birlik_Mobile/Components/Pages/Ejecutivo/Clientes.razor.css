@@ -1,4 +1,4 @@
-.polizas-container {
+.clientes-container {
     padding: 1rem;
     background: var(--light-bg);
     min-height: 100vh;
@@ -14,7 +14,7 @@
     padding: 0 0.5rem;
 }
 
-.back-btn, .refresh-btn {
+.back-btn, .add-btn {
     width: 44px;
     height: 44px;
     border-radius: 12px;
@@ -28,7 +28,7 @@
     transition: all 0.2s;
 }
 
-.back-btn:hover, .refresh-btn:hover {
+.back-btn:hover, .add-btn:hover {
     background: var(--primary-color);
     color: white;
     transform: translateY(-1px);
@@ -42,6 +42,61 @@
     flex: 1;
     text-align: center;
     margin: 0 1rem;
+}
+
+/* Estadísticas */
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
 }
 
 /* Filtros */
@@ -110,14 +165,14 @@
     color: var(--primary-color);
 }
 
-/* Lista de pólizas */
-.polizas-list {
+/* Lista de clientes */
+.clientes-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.poliza-card {
+.cliente-card {
     background: white;
     border-radius: 16px;
     padding: 1.5rem;
@@ -129,57 +184,63 @@
     overflow: hidden;
 }
 
-.poliza-card:hover {
+.cliente-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     border-color: var(--primary-color);
 }
 
-.poliza-card.warning {
-    border-left: 4px solid var(--warning-color);
+.cliente-card.active {
+    border-left: 4px solid var(--success-color);
 }
 
-.poliza-card.expired {
-    border-left: 4px solid var(--danger-color);
+.cliente-card.inactive {
+    border-left: 4px solid #6b7280;
 }
 
-.poliza-header {
+.cliente-header {
     display: flex;
     align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.poliza-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
+.cliente-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1.5rem;
+    font-size: 2rem;
 }
 
-.poliza-info {
+.cliente-info {
     flex: 1;
 }
 
-.poliza-nombre {
+.cliente-nombre {
     font-size: 1.1rem;
     font-weight: 700;
     color: #1f2937;
     margin: 0 0 0.25rem 0;
 }
 
-.poliza-numero {
+.cliente-cedula {
     font-size: 0.9rem;
     color: #6b7280;
+    margin: 0 0 0.25rem 0;
+}
+
+.cliente-email {
+    font-size: 0.9rem;
+    color: var(--primary-color);
     margin: 0;
 }
 
-.poliza-status {
+.cliente-status {
     display: flex;
     align-items: center;
 }
@@ -198,23 +259,18 @@
     color: #065f46;
 }
 
-.status-badge.warning {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.status-badge.expired {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
 .status-badge.inactive {
     background: #f3f4f6;
     color: #6b7280;
 }
 
-/* Detalles de póliza */
-.poliza-details {
+.status-badge.unknown {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* Detalles de cliente */
+.cliente-details {
     margin-bottom: 1rem;
 }
 
@@ -243,7 +299,7 @@
 }
 
 /* Acciones */
-.poliza-actions {
+.cliente-actions {
     display: flex;
     gap: 0.75rem;
 }
@@ -259,7 +315,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    transition: all 0.2s;
+    transition: all 0 kra2s;
     cursor: pointer;
 }
 
@@ -282,6 +338,16 @@
 .action-btn.secondary:hover {
     background: #e5e7eb;
     color: #374151;
+}
+
+.action-btn.call {
+    background: var(--success-color);
+    color: white;
+}
+
+.action-btn.call:hover {
+    background: #059669;
+    transform: translateY(-1px);
 }
 
 /* Banner de advertencia */
@@ -373,7 +439,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .polizas-container {
+    .clientes-container {
         padding: 0.75rem;
     }
     
@@ -382,25 +448,48 @@
         margin: 0 0.5rem;
     }
     
-    .poliza-card {
-        padding: 1rem;
-    }
-    
-    .poliza-header {
+    .stats-section {
+        grid-template-columns: 1fr;
         gap: 0.75rem;
     }
     
-    .poliza-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
+    .stat-card {
+        padding: 0.75rem;
     }
     
-    .poliza-nombre {
+    .stat-icon {
+        width: 35px;
+        height: 35px;
         font-size: 1rem;
     }
     
-    .poliza-numero {
+    .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .cliente-card {
+        padding: 1rem;
+    }
+    
+    .cliente-header {
+        gap: 0.75rem;
+    }
+    
+    .cliente-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .cliente-nombre {
+        font-size: 1rem;
+    }
+    
+    .cliente-cedula, .cliente-email {
         font-size: 0.8rem;
     }
     
@@ -430,12 +519,6 @@
         height: 50px;
         font-size: 1.3rem;
     }
-}
-
-@media (max-width: 480px) {
-    .poliza-actions {
-        flex-direction: column;
-    }
     
     .filter-buttons {
         gap: 0.25rem;
@@ -444,5 +527,15 @@
     .filter-btn {
         padding: 0.6rem 1rem;
         font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cliente-actions {
+        flex-direction: column;
+    }
+    
+    .stats-section {
+        gap: 0.5rem;
     }
 }

@@ -1,582 +1,302 @@
 ﻿@page "/cliente/emergencia"
 @inject NavigationManager Nav
-@inject Birlik_Mobile.Services.AuthService AuthService
 
-<RoleGuard AllowedRole="Cliente">
-    <div class="emergency-container">
-        <!-- Header de emergencia -->
-        <div class="emergency-header">
-            <button class="back-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
-                <i class="bi bi-arrow-left"></i>
-            </button>
-            <div class="header-content">
-                <h1 class="emergency-title">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    Emergencia
-                </h1>
-                <p class="emergency-subtitle">Asistencia inmediata las 24 horas</p>
+<div class="emergencia-container">
+    <!-- Header de emergencia -->
+    <div class="emergency-header">
+        <button class="back-btn" @onclick="@(() => Nav.NavigateTo("/cliente/dashboard"))">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h1 class="page-title">Emergencia</h1>
+        <button class="sos-btn" @onclick="ActivarSOS">
+            <i class="bi bi-telephone"></i>
+        </button>
+    </div>
+
+    <!-- Botón SOS principal -->
+    <div class="sos-main-section">
+        <div class="sos-card">
+            <div class="sos-icon">
+                <i class="bi bi-exclamation-triangle"></i>
             </div>
-        </div>
-
-        <!-- Estado de emergencia -->
-        <div class="emergency-status">
-            @if (!emergenciaActiva)
-            {
-                <div class="status-card normal">
-                    <div class="status-icon">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
-                    <h3>Estado Normal</h3>
-                    <p>Tu sistema de emergencia está listo para ayudarte</p>
-                </div>
-            }
-            else
-            {
-                <div class="status-card active">
-                    <div class="status-icon pulsing">
-                        <i class="bi bi-exclamation-triangle"></i>
-                    </div>
-                    <h3>Emergencia Reportada</h3>
-                    <p>Tu solicitud de ayuda ha sido enviada</p>
-                </div>
-            }
-        </div>
-
-        <!-- Botón de emergencia principal -->
-        <div class="emergency-button-container">
-            @if (!emergenciaActiva)
-            {
-                <button class="emergency-button" 
-                        @onclick="ActivarEmergencia"
-                        disabled="@procesando">
-                    <div class="button-content">
-                        <i class="bi bi-telephone-outbound emergency-icon"></i>
-                        <span class="button-text">SOLICITAR AYUDA</span>
-                        <span class="button-subtitle">Presiona para emergencia</span>
-                    </div>
-                </button>
-            }
-            else
-            {
-                <div class="emergency-active">
-                    <div class="active-icon">
-                        <i class="bi bi-telephone-fill"></i>
-                    </div>
-                    <h3>Ayuda en camino</h3>
-                    <p>Hemos recibido tu solicitud de emergencia</p>
-                    <div class="timer">
-                        <i class="bi bi-clock"></i>
-                        <span>Tiempo de respuesta: @tiempoRespuesta segundos</span>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <!-- Información de contacto -->
-        <div class="contact-info">
-            <h4>
-                <i class="bi bi-telephone me-2"></i>
-                Números de Emergencia
-            </h4>
-            <div class="contact-grid">
-                <div class="contact-item" @onclick="@(()=>LlamarNumero("+51-1-123-4567"))">
-                    <div class="contact-icon">
-                        <i class="bi bi-telephone"></i>
-                    </div>
-                    <div class="contact-details">
-                        <h5>Emergencias 24/7</h5>
-                        <p>+51-1-123-4567</p>
-                    </div>
-                    <i class="bi bi-chevron-right"></i>
-                </div>
-                <div class="contact-item" @onclick="@(()=>LlamarNumero("+51-987-654-321"))">
-                    <div class="contact-icon">
-                        <i class="bi bi-phone"></i>
-                    </div>
-                    <div class="contact-details">
-                        <h5>Tu Ejecutivo</h5>
-                        <p>+51-987-654-321</p>
-                    </div>
-                    <i class="bi bi-chevron-right"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Información adicional -->
-        <div class="emergency-info">
-            <div class="info-card">
-                <div class="info-header">
-                    <i class="bi bi-info-circle"></i>
-                    <h5>Información Importante</h5>
-                </div>
-                <div class="info-content">
-                    <ul>
-                        <li>Usa el botón de emergencia solo en situaciones reales</li>
-                        <li>Proporciona tu ubicación exacta si es posible</li>
-                        <li>Mantén la calma mientras se comunican contigo</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mensaje de estado -->
-        @if (!string.IsNullOrEmpty(mensaje))
-        {
-            <div class="alert @GetAlertClass()">
-                <i class="bi @GetAlertIcon() me-2"></i>
-                @mensaje
-            </div>
-        }
-
-        <!-- Acciones adicionales -->
-        <div class="additional-actions">
-            <button class="action-btn secondary" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
-                <i class="bi bi-house"></i>
-                <span>Volver al Inicio</span>
-            </button>
-            <button class="action-btn secondary" @onclick="CancelarEmergencia" style="@(emergenciaActiva ? "" : "display: none;")">
-                <i class="bi bi-x-circle"></i>
-                <span>Cancelar Emergencia</span>
+            <h2 class="sos-title">¿Necesitas ayuda inmediata?</h2>
+            <p class="sos-description">Presiona el botón de emergencia para contactar a nuestros especialistas</p>
+            
+            <button class="sos-main-btn @(isSOSActive ? "active" : "")" @onclick="ActivarSOS">
+                <i class="bi bi-telephone-fill"></i>
+                <span>@(isSOSActive ? "Llamando..." : "SOS EMERGENCIA")</span>
             </button>
         </div>
     </div>
-</RoleGuard>
 
-<style>
-.emergency-container {
-    padding: 1rem;
-    background: var(--light-bg);
-    min-height: 100vh;
-}
+    <!-- Opciones de contacto -->
+    <div class="contact-options">
+        <h3 class="section-title">
+            <i class="bi bi-telephone me-2"></i>
+            Opciones de Contacto
+        </h3>
+        
+        <div class="contact-grid">
+            <button class="contact-btn emergency" @onclick="LlamarEmergencia">
+                <div class="contact-icon">
+                    <i class="bi bi-telephone-fill"></i>
+                </div>
+                <div class="contact-info">
+                    <h4>Emergencia 24/7</h4>
+                    <p>911</p>
+                </div>
+            </button>
 
-.emergency-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-}
+            <button class="contact-btn support" @onclick="LlamarSoporte">
+                <div class="contact-icon">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <div class="contact-info">
+                    <h4>Soporte Birlik</h4>
+                    <p>+506 2222-2222</p>
+                </div>
+            </button>
 
-.back-btn {
-    background: var(--danger-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
+            <button class="contact-btn whatsapp" @onclick="AbrirWhatsApp">
+                <div class="contact-icon">
+                    <i class="bi bi-whatsapp"></i>
+                </div>
+                <div class="contact-info">
+                    <h4>WhatsApp</h4>
+                    <p>+506 8888-8888</p>
+                </div>
+            </button>
 
-.back-btn:hover {
-    background: #dc2626;
-    transform: scale(1.05);
-}
+            <button class="contact-btn email" @onclick="EnviarEmail">
+                <div class="contact-icon">
+                    <i class="bi bi-envelope"></i>
+                </div>
+                <div class="contact-info">
+                    <h4>Email</h4>
+                    <p>emergencias@birlik.com</p>
+                </div>
+            </button>
+        </div>
+    </div>
 
-.header-content {
-    flex: 1;
-}
+    <!-- Comisarías cercanas -->
+    <div class="comisarias-section">
+        <h3 class="section-title">
+            <i class="bi bi-geo-alt me-2"></i>
+            Comisarías Cercanas
+        </h3>
+        
+        <div class="map-container">
+            <!-- Placeholder para el mapa de Google -->
+            <div class="map-placeholder" @onclick="AbrirMapaCompleto">
+                <div class="map-content">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <h4>Ver en Mapa</h4>
+                    <p>Toque para abrir Google Maps con las comisarías más cercanas</p>
+                    <button class="map-btn">
+                        <i class="bi bi-arrow-up-right"></i>
+                        Abrir Mapa
+                    </button>
+                </div>
+            </div>
+        </div>
 
-.emergency-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--danger-color);
-    margin: 0;
-}
+        <!-- Lista de comisarías -->
+        <div class="comisarias-list">
+            @foreach (var comisaria in GetComisariasCercanas())
+            {
+                <div class="comisaria-card" @onclick="@(() => AbrirDireccion(comisaria.Direccion))">
+                    <div class="comisaria-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="comisaria-info">
+                        <h4 class="comisaria-nombre">@comisaria.Nombre</h4>
+                        <p class="comisaria-direccion">@comisaria.Direccion</p>
+                        <p class="comisaria-distancia">@comisaria.Distancia km</p>
+                    </div>
+                    <div class="comisaria-actions">
+                        <button class="action-btn" @onclick="@(() => LlamarComisaria(comisaria.Telefono))" @onclick:stopPropagation="true">
+                            <i class="bi bi-telephone"></i>
+                        </button>
+                        <button class="action-btn" @onclick="@(() => AbrirDireccion(comisaria.Direccion))" @onclick:stopPropagation="true">
+                            <i class="bi bi-navigation"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 
-.emergency-subtitle {
-    color: #6b7280;
-    margin: 0;
-    font-size: 0.9rem;
-}
+    <!-- Información de emergencia -->
+    <div class="emergency-info">
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="bi bi-info-circle"></i>
+            </div>
+            <div class="info-content">
+                <h4>Información Importante</h4>
+                <ul>
+                    <li>En caso de emergencia médica, llame al 911</li>
+                    <li>Para siniestros de seguros, contacte a Birlik</li>
+                    <li>Mantenga sus datos personales actualizados</li>
+                    <li>Guarde este número en sus contactos de emergencia</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-.emergency-status {
-    margin-bottom: 2rem;
-}
-
-.status-card {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    text-align: center;
-    box-shadow: var(--card-shadow);
-    border: 3px solid transparent;
-}
-
-.status-card.normal {
-    border-color: var(--success-color);
-}
-
-.status-card.active {
-    border-color: var(--danger-color);
-    background: linear-gradient(135deg, #fef2f2, #ffffff);
-}
-
-.status-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.status-card.normal .status-icon {
-    color: var(--success-color);
-}
-
-.status-card.active .status-icon {
-    color: var(--danger-color);
-}
-
-.pulsing {
-    animation: pulse 1s infinite;
-}
-
-.emergency-button-container {
-    margin-bottom: 2rem;
-    display: flex;
-    justify-content: center;
-}
-
-.emergency-button {
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--danger-color), #dc2626);
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.emergency-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 35px rgba(239, 68, 68, 0.6);
-}
-
-.emergency-button:active {
-    transform: scale(0.95);
-}
-
-.button-content {
-    text-align: center;
-    z-index: 2;
-}
-
-.emergency-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    display: block;
-}
-
-.button-text {
-    font-size: 1.2rem;
-    font-weight: 700;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.button-subtitle {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-.emergency-active {
-    text-align: center;
-    padding: 2rem;
-}
-
-.active-icon {
-    font-size: 4rem;
-    color: var(--danger-color);
-    margin-bottom: 1rem;
-    animation: pulse 1s infinite;
-}
-
-.emergency-active h3 {
-    color: var(--danger-color);
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.timer {
-    background: rgba(239, 68, 68, 0.1);
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    color: var(--danger-color);
-    font-weight: 600;
-}
-
-.contact-info {
-    margin-bottom: 2rem;
-}
-
-.contact-info h4 {
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-}
-
-.contact-grid {
-    display: grid;
-    gap: 1rem;
-}
-
-.contact-item {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: var(--card-shadow);
-    border: 2px solid transparent;
-}
-
-.contact-item:hover {
-    border-color: var(--primary-color);
-    transform: translateY(-2px);
-}
-
-.contact-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-}
-
-.contact-details {
-    flex: 1;
-}
-
-.contact-details h5 {
-    font-weight: 600;
-    margin: 0 0 0.25rem 0;
-    color: #1f2937;
-}
-
-.contact-details p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 0.9rem;
-}
-
-.emergency-info {
-    margin-bottom: 2rem;
-}
-
-.info-card {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--card-shadow);
-}
-
-.info-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    color: var(--info-color);
-}
-
-.info-header i {
-    font-size: 1.5rem;
-}
-
-.info-header h5 {
-    margin: 0;
-    font-weight: 600;
-}
-
-.info-content ul {
-    margin: 0;
-    padding-left: 1.5rem;
-}
-
-.info-content li {
-    margin-bottom: 0.5rem;
-    color: #6b7280;
-    line-height: 1.5;
-}
-
-.additional-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-bottom: 2rem;
-}
-
-.action-btn {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.action-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    transform: translateY(-2px);
-}
-
-.action-btn.secondary:hover {
-    border-color: var(--secondary-color);
-    color: var(--secondary-color);
-}
-
-/* Animaciones */
-@@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
+    <!-- Estado de llamada -->
+    @if (isSOSActive)
+    {
+        <div class="sos-overlay">
+            <div class="sos-modal">
+                <div class="sos-modal-content">
+                    <div class="sos-modal-icon">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                    <h3>Conectando con Emergencias...</h3>
+                    <p>Por favor espere mientras conectamos su llamada</p>
+                    <div class="sos-timer">@GetTiempoTranscurrido()</div>
+                    <button class="sos-cancel-btn" @onclick="CancelarSOS">
+                        <i class="bi bi-x-lg"></i>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
     }
-    50% {
-        transform: scale(1.1);
-        opacity: 0.8;
-    }
-}
-
-/* Responsive */
-@@media (max-width: 768px) {
-    .emergency-container {
-        padding: 0.75rem;
-    }
-    
-    .emergency-button {
-        width: 220px;
-        height: 220px;
-    }
-    
-    .emergency-icon {
-        font-size: 3rem;
-    }
-    
-    .button-text {
-        font-size: 1rem;
-    }
-    
-    .contact-item {
-        padding: 1rem;
-    }
-    
-    .additional-actions {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .action-btn {
-        justify-content: center;
-    }
-}
-</style>
+</div>
 
 @code {
-    private bool emergenciaActiva = false;
-    private bool procesando = false;
-    private int tiempoRespuesta = 0;
-    private string mensaje = string.Empty;
-    private Timer? timer;
+    private bool isSOSActive = false;
+    private DateTime sosStartTime;
+    private Timer? sosTimer;
 
-    private async Task ActivarEmergencia()
+    private List<ComisariaInfo> comisarias = new()
     {
-        if (procesando) return;
-
-        procesando = true;
-        mensaje = string.Empty;
-
-        try
+        new ComisariaInfo
         {
-            // Simular envío de emergencia
-            await Task.Delay(2000);
-
-            emergenciaActiva = true;
-            tiempoRespuesta = 0;
-            
-            // Iniciar timer
-            timer = new Timer(ActualizarTiempo, null, 0, 1000);
-
-            mensaje = "¡Emergencia reportada! Se comunicarán contigo en breve.";
-        }
-        catch (Exception ex)
+            Nombre = "Comisaría Central",
+            Direccion = "Av. Central, San José",
+            Telefono = "2222-0000",
+            Distancia = 0.8
+        },
+        new ComisariaInfo
         {
-            mensaje = "Error al reportar la emergencia. Inténtalo nuevamente.";
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
+            Nombre = "Comisaría La Sabana",
+            Direccion = "Paseo Colón, San José",
+            Telefono = "2222-0001",
+            Distancia = 1.2
+        },
+        new ComisariaInfo
         {
-            procesando = false;
+            Nombre = "Comisaría Hatillo",
+            Direccion = "Hatillo Centro, San José",
+            Telefono = "2222-0002",
+            Distancia = 2.5
         }
+    };
+
+    private IEnumerable<ComisariaInfo> GetComisariasCercanas()
+    {
+        return comisarias.OrderBy(c => c.Distancia);
     }
 
-    private void ActualizarTiempo(object? state)
+    private void ActivarSOS()
     {
-        tiempoRespuesta++;
-        // StateHasChanged();
+        if (isSOSActive)
+        {
+            CancelarSOS();
+            return;
+        }
+
+        isSOSActive = true;
+        sosStartTime = DateTime.Now;
+        
+        // Iniciar timer para mostrar tiempo transcurrido
+        sosTimer = new Timer(UpdateTimer, null, 0, 1000);
+        
+        // Simular llamada (en una app real, aquí se haría la llamada real)
+        StateHasChanged();
     }
 
-    private void CancelarEmergencia()
+    private void CancelarSOS()
     {
-        emergenciaActiva = false;
-        tiempoRespuesta = 0;
-        mensaje = "Emergencia cancelada.";
-        timer?.Dispose();
+        isSOSActive = false;
+        sosTimer?.Dispose();
+        sosTimer = null;
+        StateHasChanged();
     }
 
-    private void LlamarNumero(string numero)
+    private void UpdateTimer(object? state)
     {
-        // En una aplicación real, aquí se abriría el dialer del teléfono
-        mensaje = $"Llamando a {numero}...";
-        Console.WriteLine($"Llamando a: {numero}");
+        InvokeAsync(StateHasChanged);
     }
 
-    private string GetAlertClass()
+    private string GetTiempoTranscurrido()
     {
-        if (mensaje.Contains("reportada") || mensaje.Contains("ayuda"))
-            return "alert-success";
-        else if (mensaje.Contains("Error"))
-            return "alert-danger";
-        else
-            return "alert-info";
+        if (!isSOSActive) return "00:00";
+        
+        var elapsed = DateTime.Now - sosStartTime;
+        return $"{elapsed.Minutes:D2}:{elapsed.Seconds:D2}";
     }
 
-    private string GetAlertIcon()
+    private void LlamarEmergencia()
     {
-        if (mensaje.Contains("reportada") || mensaje.Contains("ayuda"))
-            return "bi-check-circle";
-        else if (mensaje.Contains("Error"))
-            return "bi-exclamation-triangle";
-        else
-            return "bi-info-circle";
+        // TODO: Implementar llamada a 911
+        ShowMessage("Llamando a emergencias 911...");
+    }
+
+    private void LlamarSoporte()
+    {
+        // TODO: Implementar llamada a soporte
+        ShowMessage("Llamando a soporte Birlik...");
+    }
+
+    private void AbrirWhatsApp()
+    {
+        // TODO: Implementar apertura de WhatsApp
+        ShowMessage("Abriendo WhatsApp...");
+    }
+
+    private void EnviarEmail()
+    {
+        // TODO: Implementar envío de email
+        ShowMessage("Abriendo cliente de email...");
+    }
+
+    private void AbrirMapaCompleto()
+    {
+        // TODO: Implementar apertura de Google Maps
+        ShowMessage("Abriendo Google Maps...");
+    }
+
+    private void LlamarComisaria(string telefono)
+    {
+        ShowMessage($"Llamando a {telefono}...");
+    }
+
+    private void AbrirDireccion(string direccion)
+    {
+        ShowMessage($"Abriendo navegación hacia: {direccion}");
+    }
+
+    private void ShowMessage(string message)
+    {
+        // TODO: Implementar sistema de notificaciones
+        Console.WriteLine(message);
+    }
+
+    private class ComisariaInfo
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Direccion { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public double Distancia { get; set; }
     }
 
     public void Dispose()
     {
-        timer?.Dispose();
+        sosTimer?.Dispose();
     }
 }
