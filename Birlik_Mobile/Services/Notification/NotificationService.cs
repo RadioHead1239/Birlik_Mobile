@@ -27,7 +27,7 @@ namespace Birlik_Mobile.Services
                 }
             };
 
-         //   await LocalNotificationCenter.Current.Show(request);
+            await LocalNotificationCenter.Current.Show(request);
         }
     }
 }
