@@ -8,7 +8,7 @@ namespace Birlik_Mobile.Models.Request
 {
     public class LoginRequestDTO
     {
-        public string Correo { get; set; } = string.Empty;
+            public string Correo { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
     }
 }

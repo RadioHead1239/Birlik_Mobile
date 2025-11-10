@@ -213,10 +213,8 @@
         isSOSActive = true;
         sosStartTime = DateTime.Now;
         
-        // Iniciar timer para mostrar tiempo transcurrido
         sosTimer = new Timer(UpdateTimer, null, 0, 1000);
         
-        // Simular llamada (en una app real, aquí se haría la llamada real)
         StateHasChanged();
     }
 
