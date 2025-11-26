@@ -8,8 +8,8 @@
     <!-- Header con logo -->
     <div class="login-header">
         <div class="logo-container">
-            <img src="https://plataformabirlik.azurewebsites.net/Theme/Front-v2-1/dist/assets/imagen/presentacion/logobi_n.svg" 
-                 alt="Birlik Corredor de Seguros"  
+            <img src="https://plataformabirlik.azurewebsites.net/Theme/Front-v2-1/dist/assets/imagen/presentacion/logobi_n.svg"
+                 alt="Birlik Corredor de Seguros"
                  class="logo" />
         </div>
     </div>
@@ -24,12 +24,12 @@
                 </h3>
                 <p class="text-white-50 mb-0 mt-2">Accede a tu cuenta para continuar</p>
             </div>
-            
+
             <div class="card-body">
                 <form @onsubmit="IniciarSesion" @onsubmit:preventDefault="true">
                     <div class="form-floating mb-3">
-                        <input type="text" 
-                               class="form-control @(hasError ? "is-invalid" : "")" 
+                        <input type="text"
+                               class="form-control @(hasError ? "is-invalid" : "")"
                                id="usuario"
                                placeholder="Usuario"
                                @bind="usuario"
@@ -41,8 +41,8 @@
                     </div>
 
                     <div class="form-floating mb-4">
-                        <input type="password" 
-                               class="form-control @(hasError ? "is-invalid" : "")" 
+                        <input type="password"
+                               class="form-control @(hasError ? "is-invalid" : "")"
                                id="password"
                                placeholder="Contraseña"
                                @bind="password"
@@ -53,8 +53,8 @@
                         </label>
                     </div>
 
-                    <button type="submit" 
-                            class="btn btn-primary w-100 btn-lg" 
+                    <button type="submit"
+                            class="btn btn-primary w-100 btn-lg"
                             disabled="@isLoading">
                         @if (isLoading)
                         {
@@ -114,10 +114,10 @@
                         <div class="col-12">
                             <small class="text-muted">Última URL:</small>
                             <p class="small mb-2">@ApiService.LastRequestUrl</p>
-                            
+
                             <small class="text-muted">API Key del servidor:</small>
                             <p class="small mb-2">@ApiService.LastServerSawApiKey</p>
-                            
+
                             <small class="text-muted">Último error:</small>
                             <p class="small mb-0">@ApiService.LastError</p>
                         </div>
@@ -195,34 +195,42 @@
                 return;
             }
 
-            var user = result.Data;
+            var data = result.Data;
 
-            await AuthService.SetUserAsync(new Birlik_Mobile.Models.Auth.UsuarioInfoDTO
+            var user = data.Usuario;   
+            var token = data.Token;   
+
+            var usuarioInfo = new Models.Auth.UsuarioInfoDTO
             {
-                Usuario = user.Correo,
+                Id = user.Id,
+                Correo = user.Correo,
+                Nombre = user.Nombre,
                 Rol = user.Rol
-            });
+            };
 
+            // Guardar sesión
+            await AuthService.SetUserAsync(usuarioInfo, token);
+
+            // Mensaje de bienvenida
             mensaje = $"¡Bienvenido, {user.Nombre}!";
-            hasError = false;
-            isLoading = false;
-            StateHasChanged();
 
-            await Task.Delay(1000);
-
+            // Navegación según rol
             switch (user.Rol)
             {
                 case "Cliente":
-                    NavManager.NavigateTo("/cliente/dashboard");
+                    NavManager.NavigateTo("/cliente/dashboard", forceLoad: true);
                     break;
+
                 case "Ejecutivo":
-                    NavManager.NavigateTo("/operativo/dashboard");
+                    NavManager.NavigateTo("/ejecutivo/dashboard", forceLoad: true);
                     break;
+
                 case "Gerente":
-                    NavManager.NavigateTo("/gerente/dashboard");
+                    NavManager.NavigateTo("/gerente/dashboard", forceLoad: true);
                     break;
+
                 default:
-                    NavManager.NavigateTo("/home");
+                    NavManager.NavigateTo("/home", forceLoad: true);
                     break;
             }
         }
@@ -230,9 +238,12 @@
         {
             isLoading = false;
             hasError = true;
-            mensaje = $"Error de conexión. Verifica tu internet e intenta nuevamente.";
-            Console.WriteLine($"Error login: {ex}");
+            mensaje = "Error de conexión. Verifica tu internet e intenta nuevamente.";
+            Console.WriteLine($"❌ Error login: {ex}");
             StateHasChanged();
         }
     }
+
+
+
 }

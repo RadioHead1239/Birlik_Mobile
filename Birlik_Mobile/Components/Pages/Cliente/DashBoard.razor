@@ -11,7 +11,7 @@
         <div class="welcome-content">
             <div class="user-greeting">
                 <h1 class="greeting-text">
-                    ¡Hola, <span class="text-gradient">@(AuthService.CurrentUser?.Usuario ?? "Cliente")</span>!
+                    ¡Hola, <span class="text-gradient">@(AuthService.CurrentUser?.Nombre ?? "Cliente")</span>!
                 </h1>
                 <p class="greeting-subtitle">Gestiona tus seguros de manera fácil y segura</p>
             </div>
@@ -166,7 +166,7 @@
         {
             await NotificationService.ShowNotificationAsync(
                 "Bienvenido de nuevo 👋",
-                $"Hola {AuthService.CurrentUser.Usuario}, accediste a tu panel de cliente."
+                $"Hola {AuthService.CurrentUser.Nombre}, accediste a tu panel de cliente."
             );
         }
         else

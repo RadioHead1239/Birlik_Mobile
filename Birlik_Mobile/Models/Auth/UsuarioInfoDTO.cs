@@ -8,8 +8,12 @@ namespace Birlik_Mobile.Models.Auth
 {
     public class UsuarioInfoDTO
     {
-        public string Usuario { get; set; } = string.Empty;
+        public int Id { get; set; }
+        public string Correo { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
         public string Rol { get; set; } = string.Empty;
-
     }
+
+
 }
+

@@ -31,15 +31,19 @@ namespace Birlik_Mobile.Services.Storage
             return _db.DeleteAllAsync<UserSession>();
         }
     }
-
     [Table("UserSession")]
     public class UserSession
     {
         [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        public int LocalId { get; set; }  // <-- PK REAL
 
-        public string Usuario { get; set; } = "";
-        public string Rol { get; set; } = "Cliente";
-        public string Token { get; set; } = "";
+        public int Id { get; set; }
+        public string Correo { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Rol { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
     }
+
+
+
 }

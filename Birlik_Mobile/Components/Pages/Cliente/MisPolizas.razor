@@ -1,217 +1,220 @@
-﻿@page "/cliente/polizas"
-@using Birlik_Mobile.Models.Response
-@inject NavigationManager Nav
-@inject Birlik_Mobile.Services.ApiService Api
+﻿    @page "/cliente/polizas"
+    @using Birlik_Mobile.Models.ViewModel
+    @inject NavigationManager Nav
+    @inject Birlik_Mobile.Services.AuthService AuthService
+    @inject Birlik_Mobile.Services.PolizaService PolizaService
 
-<div class="polizas-container">
-    <!-- Header de la página -->
-    <div class="page-header">
-        <button class="back-btn" @onclick="@(() => Nav.NavigateTo("/cliente/dashboard"))">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <h1 class="page-title">Mis Pólizas</h1>
-        <button class="refresh-btn" @onclick="RefrescarPolizas">
-            <i class="bi bi-arrow-clockwise"></i>
-        </button>
-    </div>
+    <RoleGuard AllowedRole="Cliente">
+        <div class="polizas-container">
 
-    <!-- Filtros y búsqueda -->
-    <div class="filters-section">
-        <div class="search-box">
-            <i class="bi bi-search"></i>
-            <input type="text" placeholder="Buscar póliza..." @bind="searchTerm" @bind:event="oninput">
-        </div>
-
-        <div class="filter-buttons">
-            <button class="filter-btn @(selectedFilter == "todas" ? "active" : "")" @onclick="@(() => selectedFilter = "todas")">
-                Todas
-            </button>
-            <button class="filter-btn @(selectedFilter == "activas" ? "active" : "")" @onclick="@(() => selectedFilter = "activas")">
-                Activas
-            </button>
-            <button class="filter-btn @(selectedFilter == "vencidas" ? "active" : "")" @onclick="@(() => selectedFilter = "vencidas")">
-                Vencidas
-            </button>
-        </div>
-    </div>
-
-    <!-- Lista de pólizas -->
-    <div class="polizas-list">
-        @if (isLoading)
-        {
-            <p class="loading-text">Cargando pólizas...</p>
-        }
-        else if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="error-message">
-                <i class="bi bi-exclamation-triangle"></i> @errorMessage
-            </div>
-        }
-        else if (!GetFilteredPolizas().Any())
-        {
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="bi bi-shield-x"></i>
-                </div>
-                <h3>No hay pólizas</h3>
-                <p>No se encontraron pólizas con los filtros seleccionados</p>
-                <button class="btn-primary" @onclick="@(() => selectedFilter = "todas")">
-                    Ver Todas
+            <!-- HEADER -->
+            <div class="page-header">
+                <button class="back-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
+                    <i class="bi bi-arrow-left"></i>
                 </button>
+                <div class="header-content">
+                    <h1 class="page-title"><i class="bi bi-shield-check me-2"></i>Mis Pólizas</h1>
+                    <p class="page-subtitle">Gestiona todos tus seguros</p>
+                </div>
             </div>
-        }
-        else
-        {
-            @foreach (var poliza in GetFilteredPolizas())
-            {
-                <div class="poliza-card @GetPolizaStatusClass(poliza)" @onclick="@(() => VerDetallePoliza(poliza.IdPoliza))">
-                    <div class="poliza-header">
-                        <div class="poliza-icon"><i class="bi bi-shield-check"></i></div>
-                        <div class="poliza-info">
-                            <h3 class="poliza-nombre">@poliza.NombreCompania</h3>
-                            <p class="poliza-numero">#@poliza.NumeroPoliza</p>
-                        </div>
-                        <div class="poliza-status">
-                            <span class="status-badge @GetPolizaStatusClass(poliza)">
-                                @((poliza.VigenciaFin.HasValue && poliza.VigenciaFin.Value.ToDateTime(TimeOnly.MinValue) < DateTime.Today)
-                                                        ? "Vencida"
-                                                        : "Activa")
-                    </span>
-                        </div>
-                    </div>
 
-                    <div class="poliza-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Ramo:</span>
-                            <span class="detail-value">@poliza.NombreRamo</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Vigencia:</span>
-                            <span class="detail-value">
-                                @poliza.VigenciaInicio?.ToString("dd/MM/yyyy") - @poliza.VigenciaFin?.ToString("dd/MM/yyyy")
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="poliza-actions">
-                        <button class="action-btn primary" @onclick="@(() => VerDetallePoliza(poliza.IdPoliza))" @onclick:stopPropagation="true">
-                            <i class="bi bi-eye"></i> Ver Detalle
-                        </button>
-                        <button class="action-btn secondary" @onclick="@(() => DescargarPoliza(poliza.Constancia?.RutaDocumento))" @onclick:stopPropagation="true">
-                            <i class="bi bi-download"></i> Constancia
-                        </button>
+            <!-- Resumen -->
+            <div class="polizas-summary">
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="bi bi-shield-check"></i></div>
+                    <div class="summary-content">
+                        <h3>@polizas.Count(p => p.EsActivo)</h3>
+                        <p>Pólizas Activas</p>
                     </div>
                 </div>
-            }
-        }
-    </div>
 
+                <div class="summary-card">
+                    <div class="summary-icon warning"><i class="bi bi-calendar-exclamation"></i></div>
+                    <div class="summary-content">
+                        <h3>@polizas.Count(p => p.DiasParaVencer <= 30 && p.DiasParaVencer > 0)</h3>
+                        <p>Próximas a vencer</p>
+                    </div>
+                </div>
 
-    <button class="fab-btn" >
-        <i class="bi bi-plus-lg"></i>
-    </button>
-
-    @if (!GetFilteredPolizas().Any())
-    {
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="bi bi-shield-x"></i>
+                <div class="summary-card">
+                    <div class="summary-icon success"><i class="bi bi-check-circle"></i></div>
+                    <div class="summary-content">
+                        <h3>@polizas.Count()</h3>
+                        <p>Total de pólizas</p>
+                    </div>
+                </div>
             </div>
-            <h3>No hay pólizas</h3>
-            <p>No se encontraron pólizas con los filtros seleccionados</p>
-            <button class="btn-primary" @onclick="@(() => selectedFilter = "todas")">
-                Ver Todas
-            </button>
+
+            <!-- Filtros -->
+            <div class="filters-section">
+                <div class="filter-tabs">
+                    <button class="filter-tab @(filtroActivo == "todas" ? "active" : "")"
+                            @onclick="@(() => CambiarFiltro("todas"))">
+                        Todas
+                    </button>
+
+                    <button class="filter-tab @(filtroActivo == "activas" ? "active" : "")"
+                            @onclick="@(() => CambiarFiltro("activas"))">
+                        Activas
+                    </button>
+
+                    <button class="filter-tab @(filtroActivo == "vencidas" ? "active" : "")"
+                            @onclick="@(() => CambiarFiltro("vencidas"))">
+                        Vencidas
+                    </button>
+                </div>
+            </div>
+
+            <!-- LISTA DE PÓLIZAS -->
+            <div class="polizas-list">
+                @if (cargando)
+                {
+                    <p>Cargando pólizas...</p>
+                }
+                else
+                {
+                    @foreach (var poliza in ObtenerPolizasFiltradas())
+                    {
+                        <div class="poliza-card @poliza.Estado.ToLower()">
+                            <div class="poliza-header">
+                                <div class="poliza-info">
+                                    <h4 class="poliza-numero">Póliza #@poliza.Numero</h4>
+                                    <span class="poliza-ramo">@poliza.Ramo</span>
+                                </div>
+
+                                <div class="poliza-status">
+                                    <span class="status-badge @poliza.Estado.ToLower()">@poliza.Estado</span>
+                                </div>
+                            </div>
+
+                            <div class="poliza-details">
+                                <div class="detail-row">
+                                    <i class="bi bi-calendar3"></i>
+                                    <span>
+                                        Vigencia: 
+                                        @poliza.Inicio.ToString("dd/MM/yyyy")
+                                         - 
+                                        @poliza.Fin.ToString("dd/MM/yyyy")
+                                    </span>
+                                </div>
+
+                                <div class="detail-row">
+                                    <i class="bi bi-building"></i>
+                                    <span>Aseguradora: @poliza.Aseguradora</span>
+                                </div>
+                            </div>
+
+                            <div class="poliza-actions">
+                                <button class="action-btn primary" @onclick="@(() => VerDetalle(poliza))">
+                                    <i class="bi bi-eye"></i>Ver Detalle
+                                </button>
+
+                                <button class="action-btn secondary" @onclick="@(() => DescargarPoliza(poliza))">
+                                    <i class="bi bi-download"></i>Descargar
+                                </button>
+
+                                @if (poliza.EsActivo && poliza.DiasParaVencer <= 30)
+                                {
+                                    <button class="action-btn warning" @onclick="@(() => RenovarPoliza(poliza))">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                        Renovar
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- Sin pólizas -->
+            @if (!ObtenerPolizasFiltradas().Any() && !cargando)
+            {
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="bi bi-shield"></i></div>
+                    <h3>No hay pólizas</h3>
+                    <p>No se encontraron pólizas con el filtro seleccionado.</p>
+                    <button class="btn btn-primary" @onclick="@(() => CambiarFiltro("todas"))">Ver todas las pólizas</button>
+                </div>
+            }
+
         </div>
-    }
-</div>
+    </RoleGuard>
 
-@code {
-    private string searchTerm = string.Empty;
-    private string selectedFilter = "todas";
 
-    private List<PolizaResponseDTO> polizas = new();
+    @code {
+        private List<PolizaViewModel> polizas = new();
+        private string filtroActivo = "todas";
+        private bool cargando = true;
+        private string mensaje = string.Empty;
 
-    private bool isLoading = true;
-    private string? errorMessage;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await CargarPolizasAsync();
-    }
-
-    private async Task CargarPolizasAsync()
-    {
-        try
+        protected override async Task OnInitializedAsync()
         {
-            isLoading = true;
-            errorMessage = null;
-
-            // 🧠 reemplaza este idCliente con el del usuario logueado (por ahora lo usamos fijo)
-            int idCliente = 119;
-
-            var result = await Api.GetPolizaClienteAsync(idCliente);
-
-            if (result.IsSuccess && result.Data != null)
+            try
             {
-                // si tu endpoint devuelve una sola póliza, la metemos a la lista
-                polizas = new List<PolizaResponseDTO> { result.Data };
+                cargando = true;
+
+                var usuario = await AuthService.ObtenerUsuarioLogueado();
+                int idCliente = usuario.Id;
+
+                polizas = await PolizaService.ObtenerPolizasClienteAsync(idCliente);
+
+                foreach (var p in polizas)
+                {
+                    if (!p.EsActivo)
+                    {
+                        p.Estado = "Vencida";
+                    }
+                    else if (p.DiasParaVencer <= 0)
+                    {
+                        p.Estado = "Vencida";
+                    }
+                    else if (p.DiasParaVencer <= 30)
+                    {
+                        p.Estado = "Proxima-Vencer";
+                    }
+                    else
+                    {
+                        p.Estado = "Activa";
+                    }
+                }
             }
-            else
+            catch
             {
-                errorMessage = result.ErrorMessage ?? "No se pudieron cargar las pólizas.";
+                mensaje = "Error al cargar las pólizas.";
+            }
+            finally
+            {
+                cargando = false;
             }
         }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error inesperado: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
 
-    private IEnumerable<PolizaResponseDTO> GetFilteredPolizas()
-    {
-        var filtered = polizas.AsEnumerable();
-
-        if (!string.IsNullOrEmpty(searchTerm))
+        private List<PolizaViewModel> ObtenerPolizasFiltradas()
         {
-            filtered = filtered.Where(p =>
-                (p.NumeroPoliza ?? "").Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                (p.NombreCompania ?? "").Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            return filtroActivo switch
+            {
+                "activas" => polizas.Where(p => p.Estado == "Activa").ToList(),
+                "vencidas" => polizas.Where(p => p.Estado == "Vencida").ToList(),
+                _ => polizas
+            };
         }
 
-        return filtered;
-    }
-
-    private string GetPolizaStatusClass(PolizaResponseDTO poliza)
-    {
-        if (poliza.VigenciaFin.HasValue)
+        private void CambiarFiltro(string filtro)
         {
-            var fechaFin = poliza.VigenciaFin.Value.ToDateTime(TimeOnly.MinValue);
-
-            if (fechaFin < DateTime.Today) return "expired";
-            if (fechaFin <= DateTime.Today.AddDays(30)) return "warning";
+            filtroActivo = filtro;
         }
 
-        return "active";
-    }
+        private void VerDetalle(PolizaViewModel poliza)
+        {
+            Nav.NavigateTo($"/cliente/poliza/{poliza.Id}");
+        }
 
-    private void VerDetallePoliza(int polizaId)
-    {
-        Nav.NavigateTo($"/cliente/poliza-detalle/{polizaId}");
-    }
+        private void DescargarPoliza(PolizaViewModel poliza)
+        {
+            Nav.NavigateTo(poliza.Documento, forceLoad: true);
+        }
 
-    private void DescargarPoliza(string? url)
-    {
-        if (!string.IsNullOrEmpty(url))
-            Nav.NavigateTo(url, true); // abre el PDF
+        private void RenovarPoliza(PolizaViewModel poliza)
+        {
+            Nav.NavigateTo($"/cliente/poliza/renovar/{poliza.Id}");
+        }
     }
-
-    private async Task RefrescarPolizas()
-    {
-        await CargarPolizasAsync();
-    }
-}

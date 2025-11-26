@@ -32,6 +32,9 @@ namespace Birlik_Mobile.Configuration
 
             // Servicios de dominio
             services.AddScoped<ApiService>();
+            // Registramos PolizaService (falla si no está registrado)
+            services.AddScoped<PolizaService>();
+
             services.AddSingleton<NotificationService>();
 
             // Base local y auth como singletons (una única instancia durante el ciclo de vida de la app)
@@ -40,7 +43,6 @@ namespace Birlik_Mobile.Configuration
 
             // (Descomentarlos cuando los implementes)
             // services.AddScoped<ClienteService>();
-            // services.AddScoped<PolizaService>();
             // services.AddScoped<FacturaService>();
 
             return services;
