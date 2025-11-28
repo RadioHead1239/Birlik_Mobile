@@ -3,63 +3,15 @@
 @inject Birlik_Mobile.Services.AuthService AuthService
 @inject NavigationManager NavManager
 
-<div class="app-container">
-    <!-- Barra superior -->
-    <header class="app-header">
-        <div class="header-left">
-            <button class="menu-btn" @onclick="ToggleMenu">
-                <i class="bi @(menuOpen ? "bi-x-lg" : "bi-list")"></i>
-            </button>
-            <div class="header-brand">
-                <h1 class="app-title"><i class="bi bi-shield-check me-2"></i>Birlik</h1>
-                <p class="app-subtitle">Corredor de Seguros</p>
-            </div>
-        </div>
-
-        <div class="header-right">
-            @if (AuthService.CurrentUser != null)
-            {
-                <div class="user-info">
-                    <div class="user-avatar"><i class="bi bi-person-circle"></i></div>
-                    <div class="user-details">
-                        <span class="user-name">@AuthService.CurrentUser.Correo</span>
-                        <span class="user-role">@AuthService.CurrentUser.Rol</span>
-                    </div>
-                </div>
-            }
-        </div>
-    </header>
-
-    <!-- Overlay del drawer -->
-    <div class="drawer-overlay @(menuOpen ? "show" : "")" @onclick="CloseMenu"></div>
-
-    <!-- Menú lateral -->
-    <aside class="drawer @(menuOpen ? "open" : "")">
-        <NavMenu IsOpen="menuOpen" OnClose="CloseMenu" />
-    </aside>
-
-    <!-- Contenido principal -->
-    <main class="app-content">
+<div class="app-shell">
+    <main class="content-area">
         @Body
     </main>
 
-    <!-- Botón de emergencia solo para clientes -->
-    @if (AuthService.CurrentUser?.Rol?.ToLowerInvariant() == "cliente")
+    @if (AuthService.CurrentUser != null)
     {
-        <button class="emergency-fab" @onclick="GoToEmergencia">
-            <i class="bi bi-exclamation-triangle"></i>
-        </button>
+        <div class="floating-nav-container">
+            <NavMenu />
+        </div>
     }
 </div>
-
-@code {
-    private bool menuOpen;
-
-    private void ToggleMenu() => menuOpen = !menuOpen;
-    private void CloseMenu() => menuOpen = false;
-
-    private void GoToEmergencia()
-    {
-        NavManager.NavigateTo("/cliente/emergencia");
-    }
-}

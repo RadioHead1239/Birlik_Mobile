@@ -1,220 +1,134 @@
-﻿    @page "/cliente/polizas"
-    @using Birlik_Mobile.Models.ViewModel
-    @inject NavigationManager Nav
-    @inject Birlik_Mobile.Services.AuthService AuthService
-    @inject Birlik_Mobile.Services.PolizaService PolizaService
+﻿@page "/cliente/polizas"
+@using Birlik_Mobile.Models.ViewModel
+@inject NavigationManager Nav
+@inject Birlik_Mobile.Services.AuthService AuthService
+@inject Birlik_Mobile.Services.PolizaService PolizaService
 
-    <RoleGuard AllowedRole="Cliente">
-        <div class="polizas-container">
+<div class="page-container">
+    <div class="header-section animate-enter">
+        <button class="btn-icon-back" @onclick='() => Nav.NavigateTo("/cliente/dashboard")'>
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <h1>Mis Pólizas</h1>
+    </div>
 
-            <!-- HEADER -->
-            <div class="page-header">
-                <button class="back-btn" @onclick="@(()=>Nav.NavigateTo("/cliente/dashboard"))">
-                    <i class="bi bi-arrow-left"></i>
-                </button>
-                <div class="header-content">
-                    <h1 class="page-title"><i class="bi bi-shield-check me-2"></i>Mis Pólizas</h1>
-                    <p class="page-subtitle">Gestiona todos tus seguros</p>
-                </div>
+    <!-- Filter Tabs -->
+    <div class="filter-scroll animate-enter" style="animation-delay: 0.1s">
+        <button class="filter-pill @(filtroActivo == "todas" ? "active" : "")" 
+                @onclick='() => filtroActivo = "todas"'>Todas</button>
+        <button class="filter-pill @(filtroActivo == "activas" ? "active" : "")" 
+                @onclick='() => filtroActivo = "activas"'>Activas</button>
+        <button class="filter-pill @(filtroActivo == "vencidas" ? "active" : "")" 
+                @onclick='() => filtroActivo = "vencidas"'>Vencidas</button>
+    </div>
+
+    <!-- Policy List -->
+    <div class="policy-list animate-enter" style="animation-delay: 0.2s">
+        @if (cargando)
+        {
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Cargando tus pólizas...</p>
             </div>
-
-            <!-- Resumen -->
-            <div class="polizas-summary">
-                <div class="summary-card">
-                    <div class="summary-icon"><i class="bi bi-shield-check"></i></div>
-                    <div class="summary-content">
-                        <h3>@polizas.Count(p => p.EsActivo)</h3>
-                        <p>Pólizas Activas</p>
-                    </div>
-                </div>
-
-                <div class="summary-card">
-                    <div class="summary-icon warning"><i class="bi bi-calendar-exclamation"></i></div>
-                    <div class="summary-content">
-                        <h3>@polizas.Count(p => p.DiasParaVencer <= 30 && p.DiasParaVencer > 0)</h3>
-                        <p>Próximas a vencer</p>
-                    </div>
-                </div>
-
-                <div class="summary-card">
-                    <div class="summary-icon success"><i class="bi bi-check-circle"></i></div>
-                    <div class="summary-content">
-                        <h3>@polizas.Count()</h3>
-                        <p>Total de pólizas</p>
-                    </div>
-                </div>
+        }
+        else if (!ObtenerPolizasFiltradas().Any())
+        {
+            <div class="empty-state">
+                <i class="bi bi-folder2-open"></i>
+                <p>No hay pólizas en esta categoría</p>
             </div>
-
-            <!-- Filtros -->
-            <div class="filters-section">
-                <div class="filter-tabs">
-                    <button class="filter-tab @(filtroActivo == "todas" ? "active" : "")"
-                            @onclick="@(() => CambiarFiltro("todas"))">
-                        Todas
-                    </button>
-
-                    <button class="filter-tab @(filtroActivo == "activas" ? "active" : "")"
-                            @onclick="@(() => CambiarFiltro("activas"))">
-                        Activas
-                    </button>
-
-                    <button class="filter-tab @(filtroActivo == "vencidas" ? "active" : "")"
-                            @onclick="@(() => CambiarFiltro("vencidas"))">
-                        Vencidas
-                    </button>
-                </div>
-            </div>
-
-            <!-- LISTA DE PÓLIZAS -->
-            <div class="polizas-list">
-                @if (cargando)
-                {
-                    <p>Cargando pólizas...</p>
-                }
-                else
-                {
-                    @foreach (var poliza in ObtenerPolizasFiltradas())
-                    {
-                        <div class="poliza-card @poliza.Estado.ToLower()">
-                            <div class="poliza-header">
-                                <div class="poliza-info">
-                                    <h4 class="poliza-numero">Póliza #@poliza.Numero</h4>
-                                    <span class="poliza-ramo">@poliza.Ramo</span>
-                                </div>
-
-                                <div class="poliza-status">
-                                    <span class="status-badge @poliza.Estado.ToLower()">@poliza.Estado</span>
-                                </div>
-                            </div>
-
-                            <div class="poliza-details">
-                                <div class="detail-row">
-                                    <i class="bi bi-calendar3"></i>
-                                    <span>
-                                        Vigencia: 
-                                        @poliza.Inicio.ToString("dd/MM/yyyy")
-                                         - 
-                                        @poliza.Fin.ToString("dd/MM/yyyy")
-                                    </span>
-                                </div>
-
-                                <div class="detail-row">
-                                    <i class="bi bi-building"></i>
-                                    <span>Aseguradora: @poliza.Aseguradora</span>
-                                </div>
-                            </div>
-
-                            <div class="poliza-actions">
-                                <button class="action-btn primary" @onclick="@(() => VerDetalle(poliza))">
-                                    <i class="bi bi-eye"></i>Ver Detalle
-                                </button>
-
-                                <button class="action-btn secondary" @onclick="@(() => DescargarPoliza(poliza))">
-                                    <i class="bi bi-download"></i>Descargar
-                                </button>
-
-                                @if (poliza.EsActivo && poliza.DiasParaVencer <= 30)
-                                {
-                                    <button class="action-btn warning" @onclick="@(() => RenovarPoliza(poliza))">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                        Renovar
-                                    </button>
-                                }
-                            </div>
+        }
+        else
+        {
+            @foreach (var poliza in ObtenerPolizasFiltradas())
+            {
+                <div class="policy-card glass-panel" @onclick="() => VerDetalle(poliza)">
+                    <div class="card-top">
+                        <div class="icon-box">
+                            <i class="bi bi-shield-check"></i>
                         </div>
-                    }
-                }
-            </div>
+                        <div class="status-badge @GetStatusClass(poliza)">
+                            @poliza.Estado
+                        </div>
+                    </div>
+                    
+                    <div class="card-content">
+                        <h3>@poliza.Ramo</h3>
+                        <p class="policy-number">#@poliza.Numero</p>
+                        <p class="insurer">@poliza.Aseguradora</p>
+                    </div>
 
-            <!-- Sin pólizas -->
-            @if (!ObtenerPolizasFiltradas().Any() && !cargando)
-            {
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="bi bi-shield"></i></div>
-                    <h3>No hay pólizas</h3>
-                    <p>No se encontraron pólizas con el filtro seleccionado.</p>
-                    <button class="btn btn-primary" @onclick="@(() => CambiarFiltro("todas"))">Ver todas las pólizas</button>
+                    <div class="card-footer">
+                        <span class="date-label">Vence: @poliza.Fin.ToString("dd MMM yyyy")</span>
+                        <div class="footer-actions">
+                            <button class="btn-icon-doc" @onclick="() => VerDocumento(poliza)" @onclick:stopPropagation="true">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </button>
+                            <i class="bi bi-chevron-right arrow-icon"></i>
+                        </div>
+                    </div>
                 </div>
             }
+        }
+    </div>
+</div>
 
-        </div>
-    </RoleGuard>
+@code {
+    private List<PolizaViewModel> polizas = new();
+    private string filtroActivo = "todas";
+    private bool cargando = true;
 
-
-    @code {
-        private List<PolizaViewModel> polizas = new();
-        private string filtroActivo = "todas";
-        private bool cargando = true;
-        private string mensaje = string.Empty;
-
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        try
         {
-            try
+            var usuario = await AuthService.ObtenerUsuarioLogueado();
+            polizas = await PolizaService.ObtenerPolizasClienteAsync(usuario.Id);
+            
+            // Lógica de estados simplificada para demo
+            foreach (var p in polizas)
             {
-                cargando = true;
-
-                var usuario = await AuthService.ObtenerUsuarioLogueado();
-                int idCliente = usuario.Id;
-
-                polizas = await PolizaService.ObtenerPolizasClienteAsync(idCliente);
-
-                foreach (var p in polizas)
-                {
-                    if (!p.EsActivo)
-                    {
-                        p.Estado = "Vencida";
-                    }
-                    else if (p.DiasParaVencer <= 0)
-                    {
-                        p.Estado = "Vencida";
-                    }
-                    else if (p.DiasParaVencer <= 30)
-                    {
-                        p.Estado = "Proxima-Vencer";
-                    }
-                    else
-                    {
-                        p.Estado = "Activa";
-                    }
-                }
-            }
-            catch
-            {
-                mensaje = "Error al cargar las pólizas.";
-            }
-            finally
-            {
-                cargando = false;
+                if (!p.EsActivo || p.DiasParaVencer <= 0) p.Estado = "Vencida";
+                else if (p.DiasParaVencer <= 30) p.Estado = "Por Vencer";
+                else p.Estado = "Activa";
             }
         }
+        catch (Exception) { /* Handle error */ }
+        finally { cargando = false; }
+    }
 
-        private List<PolizaViewModel> ObtenerPolizasFiltradas()
+    private List<PolizaViewModel> ObtenerPolizasFiltradas()
+    {
+        return filtroActivo switch
         {
-            return filtroActivo switch
-            {
-                "activas" => polizas.Where(p => p.Estado == "Activa").ToList(),
-                "vencidas" => polizas.Where(p => p.Estado == "Vencida").ToList(),
-                _ => polizas
-            };
+            "activas" => polizas.Where(p => p.Estado == "Activa" || p.Estado == "Por Vencer").ToList(),
+            "vencidas" => polizas.Where(p => p.Estado == "Vencida").ToList(),
+            _ => polizas
+        };
+    }
+
+    private string GetStatusClass(PolizaViewModel p)
+    {
+        return p.Estado switch
+        {
+            "Activa" => "success",
+            "Por Vencer" => "warning",
+            _ => "danger"
+        };
+    }
+
+    private void VerDetalle(PolizaViewModel p) => Nav.NavigateTo($"/cliente/poliza/{p.Id}");
+
+    private void VerDocumento(PolizaViewModel p)
+    {
+        if (!string.IsNullOrWhiteSpace(p.Documento))
+        {
+            Nav.NavigateTo(p.Documento, true);
         }
-
-        private void CambiarFiltro(string filtro)
+        else
         {
-            filtroActivo = filtro;
-        }
-
-        private void VerDetalle(PolizaViewModel poliza)
-        {
-            Nav.NavigateTo($"/cliente/poliza/{poliza.Id}");
-        }
-
-        private void DescargarPoliza(PolizaViewModel poliza)
-        {
-            Nav.NavigateTo(poliza.Documento, forceLoad: true);
-        }
-
-        private void RenovarPoliza(PolizaViewModel poliza)
-        {
-            Nav.NavigateTo($"/cliente/poliza/renovar/{poliza.Id}");
+            Console.WriteLine("⚠ No existe documento para esta póliza.");
         }
     }
+
+}

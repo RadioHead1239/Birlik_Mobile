@@ -1,377 +1,72 @@
 ﻿@page "/cliente/datos"
 @inject NavigationManager Nav
 
-<div class="datos-container">
-    <!-- Header de la página -->
-    <div class="page-header">
-        <button class="back-btn" @onclick="@(() => Nav.NavigateTo("/cliente/dashboard"))">
-            <i class="bi bi-arrow-left"></i>
+<div class="page-container">
+    <div class="header-section animate-enter">
+        <button class="btn-icon-back" @onclick='() => Nav.NavigateTo("/cliente/dashboard")'>
+            <i class="bi bi-chevron-left"></i>
         </button>
-        <h1 class="page-title">Datos Personales</h1>
-        <button class="edit-btn" @onclick="ToggleEditMode">
-            <i class="bi @(isEditing ? "bi-check-lg" : "bi-pencil")"></i>
+        <h1>Mi Perfil</h1>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header animate-enter" style="animation-delay: 0.1s">
+        <div class="avatar-large">
+            <i class="bi bi-person"></i>
+        </div>
+        <h2>@userData.Nombres @userData.Apellidos</h2>
+        <p>@userData.Email</p>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container animate-enter" style="animation-delay: 0.2s">
+        <div class="form-group">
+            <label>Nombres</label>
+            <input type="text" class="input-modern" @bind="userData.Nombres" />
+        </div>
+
+        <div class="form-group">
+            <label>Apellidos</label>
+            <input type="text" class="input-modern" @bind="userData.Apellidos" />
+        </div>
+
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" class="input-modern" @bind="userData.Telefono" />
+        </div>
+
+        <div class="form-group">
+            <label>Dirección</label>
+            <textarea class="input-modern" rows="3" @bind="userData.Direccion"></textarea>
+        </div>
+
+        <button class="btn-primary mt-4" @onclick="GuardarDatos">
+            Guardar Cambios
         </button>
-    </div>
-
-    <!-- Información del perfil -->
-    <div class="profile-section">
-        <div class="profile-card">
-            <div class="profile-avatar">
-                <i class="bi bi-person-circle"></i>
-            </div>
-            <div class="profile-info">
-                <h2 class="profile-name">@userData.Nombres @userData.Apellidos</h2>
-                <p class="profile-email">@userData.Email</p>
-                <p class="profile-role">Cliente Birlik</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Formulario de datos -->
-    <div class="form-container">
-        <form @onsubmit="GuardarDatos" @onsubmit:preventDefault="true">
-            <!-- Información Personal -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="bi bi-person me-2"></i>
-                    Información Personal
-                </h3>
-
-                <div class="form-grid">
-                    <div class="form-floating">
-                        <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                               id="nombres" placeholder="Nombres"
-                               @bind="userData.Nombres" readonly="@(!isEditing)" required>
-                        <label for="nombres">Nombres *</label>
-                    </div>
-
-                    <div class="form-floating">
-                        <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                               id="apellidos" placeholder="Apellidos"
-                               @bind="userData.Apellidos" readonly="@(!isEditing)" required>
-                        <label for="apellidos">Apellidos *</label>
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-floating">
-                        <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                               id="cedula" placeholder="Cédula"
-                               @bind="userData.Cedula" readonly="@(!isEditing)" required>
-                        <label for="cedula">Cédula *</label>
-                    </div>
-
-                    <div class="form-floating">
-                        <input type="date" class="form-control @(isEditing ? "" : "readonly")"
-                               id="fechaNacimiento"
-                               @bind="userData.FechaNacimiento" readonly="@(!isEditing)" required>
-                        <label for="fechaNacimiento">Fecha de Nacimiento *</label>
-                    </div>
-                </div>
-
-                <div class="form-floating">
-                    <select class="form-control @(isEditing ? "" : "readonly")"
-                            id="genero" @bind="userData.Genero" disabled="@(!isEditing)" required>
-                        <option value="">Seleccione género</option>
-                        <option value="Masculino">Masculino</option>
-                        <option value="Femenino">Femenino</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                    <label for="genero">Género *</label>
-                </div>
-            </div>
-
-            <!-- Información de Contacto -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="bi bi-telephone me-2"></i>
-                    Información de Contacto
-                </h3>
-
-                <div class="form-grid">
-                    <div class="form-floating">
-                        <input type="email" class="form-control @(isEditing ? "" : "readonly")"
-                               id="email" placeholder="Email"
-                               @bind="userData.Email" readonly="@(!isEditing)" required>
-                        <label for="email">Correo Electrónico *</label>
-                    </div>
-
-                    <div class="form-floating">
-                        <input type="tel" class="form-control @(isEditing ? "" : "readonly")"
-                               id="telefono" placeholder="Teléfono"
-                               @bind="userData.Telefono" readonly="@(!isEditing)" required>
-                        <label for="telefono">Teléfono *</label>
-                    </div>
-                </div>
-
-                <div class="form-floating">
-                    <input type="tel" class="form-control @(isEditing ? "" : "readonly")"
-                           id="telefonoEmergencia" placeholder="Teléfono de Emergencia"
-                           @bind="userData.TelefonoEmergencia" readonly="@(!isEditing)">
-                    <label for="telefonoEmergencia">Teléfono de Emergencia</label>
-                </div>
-            </div>
-
-            <!-- Dirección -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="bi bi-geo-alt me-2"></i>
-                    Dirección
-                </h3>
-
-                <div class="form-floating">
-                    <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                           id="direccion" placeholder="Dirección"
-                           @bind="userData.Direccion" readonly="@(!isEditing)" required>
-                    <label for="direccion">Dirección Completa *</label>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-floating">
-                        <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                               id="ciudad" placeholder="Ciudad"
-                               @bind="userData.Ciudad" readonly="@(!isEditing)" required>
-                        <label for="ciudad">Ciudad *</label>
-                    </div>
-
-                    <div class="form-floating">
-                        <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                               id="provincia" placeholder="Provincia"
-                               @bind="userData.Provincia" readonly="@(!isEditing)" required>
-                        <label for="provincia">Provincia *</label>
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-floating">
-                        <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                               id="codigoPostal" placeholder="Código Postal"
-                               @bind="userData.CodigoPostal" readonly="@(!isEditing)">
-                        <label for="codigoPostal">Código Postal</label>
-                    </div>
-
-                    <div class="form-floating">
-                        <select class="form-control @(isEditing ? "" : "readonly")"
-                                id="pais" @bind="userData.Pais" disabled="@(!isEditing)" required>
-                            <option value="">Seleccione país</option>
-                            <option value="Costa Rica">Costa Rica</option>
-                            <option value="Estados Unidos">Estados Unidos</option>
-                            <option value="México">México</option>
-                            <option value="Colombia">Colombia</option>
-                            <option value="Panamá">Panamá</option>
-                        </select>
-                        <label for="pais">País *</label>
-                    </div>
-                </div> <!-- ✅ Este cierre faltaba -->
-            </div>
-
-            <!-- Información Adicional -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Información Adicional
-                </h3>
-
-                <div class="form-floating">
-                    <select class="form-control @(isEditing ? "" : "readonly")"
-                            id="estadoCivil" @bind="userData.EstadoCivil" disabled="@(!isEditing)">
-                        <option value="">Seleccione estado civil</option>
-                        <option value="Soltero(a)">Soltero(a)</option>
-                        <option value="Casado(a)">Casado(a)</option>
-                        <option value="Divorciado(a)">Divorciado(a)</option>
-                        <option value="Viudo(a)">Viudo(a)</option>
-                        <option value="Unión Libre">Unión Libre</option>
-                    </select>
-                    <label for="estadoCivil">Estado Civil</label>
-                </div>
-
-                <div class="form-floating">
-                    <input type="text" class="form-control @(isEditing ? "" : "readonly")"
-                           id="ocupacion" placeholder="Ocupación"
-                           @bind="userData.Ocupacion" readonly="@(!isEditing)">
-                    <label for="ocupacion">Ocupación</label>
-                </div>
-
-                <div class="form-floating">
-                    <textarea class="form-control @(isEditing ? "" : "readonly")"
-                              id="notas" placeholder="Notas adicionales"
-                              @bind="userData.Notas" readonly="@(!isEditing)" rows="3"></textarea>
-                    <label for="notas">Notas Adicionales</label>
-                </div>
-            </div>
-
-            <!-- Botones de acción -->
-            @if (isEditing)
-            {
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" @onclick="CancelarEdicion">
-                        <i class="bi bi-x-lg me-2"></i>
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn-primary" disabled="@isSaving">
-                        @if (isSaving)
-                        {
-                            <span class="loading me-2">Guardando...</span>
-                        }
-                        else
-                        {
-                            <i class="bi bi-check-lg me-2">Guardar Cambios</i>
-                        }
-                    </button>
-                </div>
-            }
-
-            <!-- Mensaje de estado -->
-            @if (!string.IsNullOrEmpty(mensaje))
-            {
-                <div class="alert @GetAlertClass()">
-                    <i class="bi @GetAlertIcon() me-2"></i>
-                    @mensaje
-                </div>
-            }
-        </form>
-    </div>
-
-    <!-- Sección de seguridad -->
-    <div class="security-section">
-        <div class="security-card">
-            <div class="security-header">
-                <i class="bi bi-shield-lock"></i>
-                <h3>Seguridad</h3>
-            </div>
-            <div class="security-actions">
-                <button class="security-btn" @onclick="CambiarPassword">
-                    <i class="bi bi-key"></i>
-                    Cambiar Contraseña
-                </button>
-                <button class="security-btn" @onclick="VerificarCuenta">
-                    <i class="bi bi-shield-check"></i>
-                    Verificar Cuenta
-                </button>
-            </div>
-        </div>
     </div>
 </div>
 
 @code {
-    private bool isEditing = false;
-    private bool isSaving = false;
-    private string mensaje = string.Empty;
-
     private UserData userData = new()
     {
         Nombres = "Juan Carlos",
-        Apellidos = "Pérez Rodríguez",
-        Cedula = "123456789",
-        FechaNacimiento = new DateTime(1985, 5, 15),
-        Genero = "Masculino",
-        Email = "juan.perez@email.com",
+        Apellidos = "Pérez",
+        Email = "juan@ejemplo.com",
         Telefono = "8888-8888",
-        TelefonoEmergencia = "8888-9999",
-        Direccion = "Av. Central, 200 metros norte del Banco Nacional",
-        Ciudad = "San José",
-        Provincia = "San José",
-        CodigoPostal = "10101",
-        Pais = "Costa Rica",
-        EstadoCivil = "Casado(a)",
-        Ocupacion = "Ingeniero",
-        Notas = "Cliente preferencial con 5 años de antigüedad"
+        Direccion = "San José, Costa Rica"
     };
 
-    private void ToggleEditMode()
+    private void GuardarDatos()
     {
-        if (isEditing)
-        {
-            GuardarDatos();
-        }
-        else
-        {
-            isEditing = true;
-            mensaje = string.Empty;
-        }
+        // Save logic
     }
 
-    private async Task GuardarDatos()
+    class UserData
     {
-        isSaving = true;
-        mensaje = string.Empty;
-        StateHasChanged();
-
-        try
-        {
-            // Simular guardado
-            await Task.Delay(2000);
-
-            // Validaciones básicas
-            if (string.IsNullOrWhiteSpace(userData.Nombres) || string.IsNullOrWhiteSpace(userData.Apellidos))
-            {
-                mensaje = "Los nombres y apellidos son obligatorios";
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(userData.Email) || string.IsNullOrWhiteSpace(userData.Telefono))
-            {
-                mensaje = "El email y teléfono son obligatorios";
-                return;
-            }
-
-            mensaje = "Datos guardados exitosamente";
-            isEditing = false;
-        }
-        catch (Exception ex)
-        {
-            mensaje = $"Error al guardar: {ex.Message}";
-        }
-        finally
-        {
-            isSaving = false;
-            StateHasChanged();
-        }
-    }
-
-    private void CancelarEdicion()
-    {
-        isEditing = false;
-        mensaje = string.Empty;
-    }
-
-    private void CambiarPassword()
-    {
-        Nav.NavigateTo("/cliente/cambiar-password");
-    }
-
-    private void VerificarCuenta()
-    {
-        Nav.NavigateTo("/cliente/verificar-cuenta");
-    }
-
-    private string GetAlertClass()
-    {
-        return mensaje.Contains("exitosamente") ? "alert-success" : "alert-danger";
-    }
-
-    private string GetAlertIcon()
-    {
-        return mensaje.Contains("exitosamente") ? "bi-check-circle" : "bi-exclamation-triangle";
-    }
-
-    private class UserData
-    {
-        public string Nombres { get; set; } = string.Empty;
-        public string Apellidos { get; set; } = string.Empty;
-        public string Cedula { get; set; } = string.Empty;
-        public DateTime FechaNacimiento { get; set; }
-        public string Genero { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Telefono { get; set; } = string.Empty;
-        public string TelefonoEmergencia { get; set; } = string.Empty;
-        public string Direccion { get; set; } = string.Empty;
-        public string Ciudad { get; set; } = string.Empty;
-        public string Provincia { get; set; } = string.Empty;
-        public string CodigoPostal { get; set; } = string.Empty;
-        public string Pais { get; set; } = string.Empty;
-        public string EstadoCivil { get; set; } = string.Empty;
-        public string Ocupacion { get; set; } = string.Empty;
-        public string Notas { get; set; } = string.Empty;
+        public string Nombres { get; set; }
+        public string Apellidos { get; set; }
+        public string Email { get; set; }
+        public string Telefono { get; set; }
+        public string Direccion { get; set; }
     }
 }
