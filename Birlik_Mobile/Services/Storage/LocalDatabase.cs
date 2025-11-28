@@ -8,42 +8,47 @@ namespace Birlik_Mobile.Services.Storage
 
         public LocalDatabase()
         {
+            // Ruta donde se guardará la BD
             var dbPath = Path.Combine(FileSystem.AppDataDirectory, "birlik_session.db3");
+
+            // Crear la conexión
             _db = new SQLiteAsyncConnection(dbPath);
 
+            // Crear la tabla al iniciar
             _db.CreateTableAsync<UserSession>().Wait();
-            Console.WriteLine($"📁 Ruta de BD local: {dbPath}");
-
         }
 
+        // Guarda o reemplaza la sesión
         public Task<int> SaveSessionAsync(UserSession session)
         {
             return _db.InsertOrReplaceAsync(session);
         }
 
+        // Obtiene la sesión actual
         public Task<UserSession?> GetSessionAsync()
         {
             return _db.Table<UserSession>().FirstOrDefaultAsync();
         }
 
+        // Borra toda la sesión
         public Task<int> ClearSessionAsync()
         {
             return _db.DeleteAllAsync<UserSession>();
         }
     }
+
+    // Modelo mapeado a SQLite
     [Table("UserSession")]
     public class UserSession
     {
         [PrimaryKey, AutoIncrement]
-        public int LocalId { get; set; }  // <-- PK REAL
+        public int LocalId { get; set; }  // PK REAL PARA SQLITE
 
+        // Datos de la API
         public int Id { get; set; }
         public string Correo { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
         public string Rol { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
     }
-
-
-
 }

@@ -26,7 +26,6 @@ namespace Birlik_Mobile.Services
                 _http.DefaultRequestHeaders.Add("x-api-key", ApiConstants.ApiKey);
         }
 
-        // 🔐 LOGIN
         public async Task<ApiResult<LoginResponseDTO>> LoginAsync(LoginRequestDTO request)
         {
             try

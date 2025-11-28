@@ -20,7 +20,7 @@ namespace Birlik_Mobile.Services
         {
             try
             {
-                var token = await _auth.GetTokenAsync();
+                    var token = await _auth.GetTokenAsync();
 
                 if (string.IsNullOrWhiteSpace(token))
                 {
@@ -32,11 +32,11 @@ namespace Birlik_Mobile.Services
                 _http.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _http.GetAsync($"api/polizas/cliente/{idCliente}");
+                var response = await _http.GetAsync($"Poliza/cliente/{idCliente}");
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"❌ PolizaService: error al obtener pólizas: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                    Console.WriteLine($"PolizaService: error al obtener pólizas: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
                     return new List<PolizaViewModel>();
                 }
 
