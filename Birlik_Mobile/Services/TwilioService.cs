@@ -1,5 +1,4 @@
 ﻿using Birlik_Mobile.Helpers;
-using Birlik_Mobile.Models.DTO;
 using Birlik_Mobile.Models.Request;
 using Birlik_Mobile.Models.Response;
 using Birlik_Mobile.Models.Result;

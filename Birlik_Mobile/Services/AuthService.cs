@@ -8,7 +8,8 @@ namespace Birlik_Mobile.Services
         private readonly LocalDatabase _db;
         public UserSession? CurrentUser { get; private set; }
 
-        public bool IsLoggedIn => CurrentUser != null;
+        // ✅ Usa 'is not null' en lugar de '!= null'
+        public bool IsLoggedIn => CurrentUser is not null;
 
         public AuthService(LocalDatabase db)
         {
@@ -17,28 +18,32 @@ namespace Birlik_Mobile.Services
 
         public async Task<string?> GetTokenAsync()
         {
-            if (CurrentUser == null)
+            // ✅ Usa 'is null' en lugar de '== null'
+            if (CurrentUser is null)
                 CurrentUser = await _db.GetSessionAsync();
 
             return CurrentUser?.Token;
         }
 
-
         public async Task<UsuarioInfoDTO?> ObtenerUsuarioLogueado()
         {
-            if (CurrentUser != null)
+            // ✅ Usa 'is not null' en lugar de '!= null'
+            if (CurrentUser is not null)
             {
                 return new UsuarioInfoDTO
                 {
                     Id = CurrentUser.Id,
                     Correo = CurrentUser.Correo,
                     Nombre = CurrentUser.Nombre,
-                    Rol = CurrentUser.Rol
+                    Rol = CurrentUser.Rol,
+                    IdCliente = CurrentUser.IdCliente
                 };
             }
 
             var session = await _db.GetSessionAsync();
-            if (session == null)
+
+            // ✅ Usa 'is null' en lugar de '== null'
+            if (session is null)
                 return null;
 
             CurrentUser = session;
@@ -48,11 +53,10 @@ namespace Birlik_Mobile.Services
                 Id = session.Id,
                 Correo = session.Correo,
                 Nombre = session.Nombre,
-                Rol = session.Rol
+                Rol = session.Rol,
+                IdCliente = session.IdCliente
             };
         }
-
-
 
         public async Task InitializeAsync()
         {
@@ -74,14 +78,13 @@ namespace Birlik_Mobile.Services
                 Correo = user.Correo,
                 Nombre = user.Nombre,
                 Rol = user.Rol,
-                Token = token 
+                Token = token,
+                IdCliente = user.IdCliente
             };
 
             await _db.SaveSessionAsync(session);
             CurrentUser = session;
         }
-
-
 
         public async Task LogoutAsync()
         {

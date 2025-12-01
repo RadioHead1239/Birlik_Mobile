@@ -72,29 +72,85 @@
         }
     </div>
 </div>
-
 @code {
     private List<PolizaViewModel> polizas = new();
     private string filtroActivo = "todas";
     private bool cargando = true;
+    private bool hayError = false;
+    private string mensajeError = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        await CargarPolizas();
+    }
+
+    private async Task CargarPolizas()
+    {
+        cargando = true;
+        hayError = false;
+        mensajeError = string.Empty;
+
         try
         {
             var usuario = await AuthService.ObtenerUsuarioLogueado();
-            polizas = await PolizaService.ObtenerPolizasClienteAsync(usuario.Id);
-            
-            // Lógica de estados simplificada para demo
+
+            // ✅ Validación del usuario
+            if (usuario == null)
+            {
+                hayError = true;
+                mensajeError = "No se pudo obtener la información del usuario";
+                Console.WriteLine("❌ Usuario no logueado");
+                Nav.NavigateTo("/login");
+                return;
+            }
+
+            // ✅ Validación del IdCliente
+            if (usuario.IdCliente <= 0)
+            {
+                hayError = true;
+                mensajeError = "Usuario sin cliente asignado. Contacte al administrador.";
+                Console.WriteLine($"⚠️ Usuario {usuario.Correo} no tiene IdCliente válido: {usuario.IdCliente}");
+                return;
+            }
+
+            Console.WriteLine($"📋 Cargando pólizas para IdCliente: {usuario.IdCliente}");
+
+            // ✅ Usa IdCliente en lugar de Id
+            polizas = await PolizaService.ObtenerPolizasClienteAsync(usuario.IdCliente);
+
+            if (polizas == null || !polizas.Any())
+            {
+                Console.WriteLine($"⚠️ No se encontraron pólizas para IdCliente: {usuario.IdCliente}");
+                polizas = new List<PolizaViewModel>();
+            }
+            else
+            {
+                Console.WriteLine($"✅ Se cargaron {polizas.Count} pólizas");
+            }
+
+            // Lógica de estados simplificada
             foreach (var p in polizas)
             {
-                if (!p.EsActivo || p.DiasParaVencer <= 0) p.Estado = "Vencida";
-                else if (p.DiasParaVencer <= 30) p.Estado = "Por Vencer";
-                else p.Estado = "Activa";
+                if (!p.EsActivo || p.DiasParaVencer <= 0)
+                    p.Estado = "Vencida";
+                else if (p.DiasParaVencer <= 30)
+                    p.Estado = "Por Vencer";
+                else
+                    p.Estado = "Activa";
             }
         }
-        catch (Exception) { /* Handle error */ }
-        finally { cargando = false; }
+        catch (Exception ex)
+        {
+            hayError = true;
+            mensajeError = "Error al cargar las pólizas. Intente nuevamente.";
+            Console.WriteLine($"❌ Error en CargarPolizas: {ex.Message}");
+            polizas = new List<PolizaViewModel>();
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
     }
 
     private List<PolizaViewModel> ObtenerPolizasFiltradas()
@@ -127,8 +183,7 @@
         }
         else
         {
-            Console.WriteLine("⚠ No existe documento para esta póliza.");
+            Console.WriteLine("⚠️ No existe documento para esta póliza.");
         }
     }
-
 }

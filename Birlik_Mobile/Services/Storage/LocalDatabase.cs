@@ -37,18 +37,17 @@ namespace Birlik_Mobile.Services.Storage
         }
     }
 
-    // Modelo mapeado a SQLite
     [Table("UserSession")]
     public class UserSession
     {
         [PrimaryKey, AutoIncrement]
-        public int LocalId { get; set; }  // PK REAL PARA SQLITE
+        public int SessionId { get; set; }
 
-        // Datos de la API
         public int Id { get; set; }
         public string Correo { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
         public string Rol { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
+        public int IdCliente { get; set; }
     }
 }

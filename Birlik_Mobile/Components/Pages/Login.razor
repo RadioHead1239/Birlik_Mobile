@@ -102,21 +102,21 @@
                 return;
             }
 
+            // ✅ Acceso directo a las propiedades del LoginResponseDTO
             var data = result.Data;
-            var user = data.Usuario;
-            var token = data.Token;
 
             var usuarioInfo = new Models.Auth.UsuarioInfoDTO
             {
-                Id = user.Id,
-                Correo = user.Correo,
-                Nombre = user.Nombre,
-                Rol = user.Rol
+                Id = data.Id,  // Necesitarás esto de la API
+                Correo = data.Correo,
+                Nombre = data.Nombre,
+                Rol = data.Rol,
+                IdCliente = data.IdCliente
             };
 
-            await AuthService.SetUserAsync(usuarioInfo, token);
+            await AuthService.SetUserAsync(usuarioInfo, data.Token);
 
-            switch (user.Rol)
+            switch (data.Rol)
             {
                 case "Cliente":
                     NavManager.NavigateTo("/cliente/dashboard", forceLoad: true);
@@ -132,11 +132,12 @@
                     break;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             isLoading = false;
             hasError = true;
             mensaje = "Error de conexión";
+            Console.WriteLine($"❌ Error en login: {ex.Message}");
             StateHasChanged();
         }
     }
