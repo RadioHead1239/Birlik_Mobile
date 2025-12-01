@@ -1,6 +1,7 @@
 ﻿@page "/cliente/emergencia"
 @inject NavigationManager Nav
 @inject Birlik_Mobile.Services.TwilioService TwilioService
+@inject Birlik_Mobile.Services.AuthService AuthService
 
 <div class="page-container emergency-bg">
     <div class="header-section animate-enter">
@@ -43,10 +44,11 @@
     </div>
 </div>
 
-
 @code {
     private bool procesando = false;
     private string mensajeEstado = string.Empty;
+    private string alertClass = "alert-info";
+    private string iconClass = "bi-info-circle";
 
     private async Task ActivarSOS()
     {
@@ -54,32 +56,133 @@
         {
             procesando = true;
             mensajeEstado = "Procesando llamada de emergencia...";
+            alertClass = "alert-info";
+            iconClass = "bi-info-circle";
+            StateHasChanged();
 
-            // Número del ejecutivo (PRUEBA OBTENIDO DEL PERFIL)
-            string numeroEjecutivo = "+51933426414";
+            // ✅ Obtener el usuario logueado
+            var usuario = await AuthService.ObtenerUsuarioLogueado();
 
-            var resultado = await TwilioService.MakeEmergencyFlowAsync(numeroEjecutivo);
-
-            if (resultado.IsSuccess)
+            if (usuario == null)
             {
-                mensajeEstado = resultado.Data?.Message ?? "Solicitud enviada.";
+                mensajeEstado = "❌ Error: No se pudo identificar al usuario";
+                alertClass = "alert-danger";
+                iconClass = "bi-x-circle";
+                Nav.NavigateTo("/login");
+                return;
+            }
+
+            if (usuario.IdCliente <= 0)
+            {
+                mensajeEstado = "❌ Error: Usuario sin cliente asignado";
+                alertClass = "alert-danger";
+                iconClass = "bi-x-circle";
+                return;
+            }
+
+            Console.WriteLine($"🚨 Activando emergencia para:");
+            Console.WriteLine($"   - Usuario: {usuario.Nombre}");
+            Console.WriteLine($"   - IdCliente: {usuario.IdCliente}");
+
+            // ✅ Llamar al servicio con el IdCliente
+            var resultado = await TwilioService.MakeEmergencyFlowAsync(usuario.IdCliente);
+
+            if (resultado.IsSuccess && resultado.Data != null)
+            {
+                mensajeEstado = resultado.Data.Message ?? "✅ Solicitud enviada correctamente";
+                alertClass = "alert-success";
+                iconClass = "bi-check-circle";
+
+                Console.WriteLine($"✅ Emergencia procesada:");
+                if (!string.IsNullOrEmpty(resultado.Data.GerenciaStatus))
+                {
+                    Console.WriteLine($"   - Estado Gerencia: {resultado.Data.GerenciaStatus}");
+                }
             }
             else
             {
                 mensajeEstado = $"❌ Error: {resultado.ErrorMessage}";
+                alertClass = "alert-danger";
+                iconClass = "bi-x-circle";
+                Console.WriteLine($"❌ Error al procesar emergencia: {resultado.ErrorMessage}");
             }
         }
         catch (Exception ex)
         {
             mensajeEstado = $"❌ Error inesperado: {ex.Message}";
+            alertClass = "alert-danger";
+            iconClass = "bi-exclamation-triangle";
+            Console.WriteLine($"❌ Excepción en ActivarSOS: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
         finally
         {
             procesando = false;
+            StateHasChanged();
         }
     }
 
-    private void Llamar911() { }
-    private void LlamarSoporte() { }
-    private void AbrirWhatsapp() { }
+    private void Llamar911()
+    {
+        try
+        {
+            // ✅ Implementación para llamar al 911
+            Console.WriteLine("📞 Intentando llamar al 911...");
+
+            // En MAUI puedes usar:
+            // await Launcher.OpenAsync($"tel:911");
+
+            mensajeEstado = "📞 Marcando 911...";
+            alertClass = "alert-info";
+            iconClass = "bi-telephone";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error al llamar al 911: {ex.Message}");
+        }
+    }
+
+    private void LlamarSoporte()
+    {
+        try
+        {
+            // ✅ Implementación para llamar a soporte
+            string numeroSoporte = "+51933426414";
+            Console.WriteLine($"📞 Intentando llamar a soporte: {numeroSoporte}");
+
+            // En MAUI puedes usar:
+            // await Launcher.OpenAsync($"tel:{numeroSoporte}");
+
+            mensajeEstado = $"📞 Llamando a soporte...";
+            alertClass = "alert-info";
+            iconClass = "bi-headset";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error al llamar a soporte: {ex.Message}");
+        }
+    }
+
+    private void AbrirWhatsapp()
+    {
+        try
+        {
+            // ✅ Implementación para abrir WhatsApp
+            string numeroWhatsapp = "51933426414"; // Sin el +
+            string mensaje = "Hola, necesito asistencia de emergencia.";
+
+            Console.WriteLine($"💬 Abriendo WhatsApp con: {numeroWhatsapp}");
+
+            // En MAUI puedes usar:
+            // await Launcher.OpenAsync($"https://wa.me/{numeroWhatsapp}?text={Uri.EscapeDataString(mensaje)}");
+
+            mensajeEstado = "💬 Abriendo WhatsApp...";
+            alertClass = "alert-success";
+            iconClass = "bi-whatsapp";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error al abrir WhatsApp: {ex.Message}");
+        }
+    }
 }

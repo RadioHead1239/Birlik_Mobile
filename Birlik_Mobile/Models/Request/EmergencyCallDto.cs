@@ -8,7 +8,7 @@ namespace Birlik_Mobile.Models.Request
 {
     public class EmergencyCallDto
     {
-        public string To { get; set; }
+        public int IdCliente { get; set; }
         public string? VoiceUrl { get; set; }
     }
 }

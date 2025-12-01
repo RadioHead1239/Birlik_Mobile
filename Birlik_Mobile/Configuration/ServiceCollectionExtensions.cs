@@ -36,6 +36,7 @@ namespace Birlik_Mobile.Configuration
             services.AddScoped<PolizaService>();
 
             services.AddSingleton<NotificationService>();
+            services.AddScoped<TwilioService>();
 
             // Base local y auth como singletons (una única instancia durante el ciclo de vida de la app)
             services.AddSingleton<LocalDatabase>();   // usa el ctor sin parámetros que ya tienes
