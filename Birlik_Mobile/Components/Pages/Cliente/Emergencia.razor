@@ -1,5 +1,6 @@
 ﻿@page "/cliente/emergencia"
 @inject NavigationManager Nav
+@inject Birlik_Mobile.Services.TwilioService TwilioService
 
 <div class="page-container emergency-bg">
     <div class="header-section animate-enter">
@@ -10,14 +11,21 @@
     </div>
 
     <div class="sos-container animate-enter" style="animation-delay: 0.1s">
-        <button class="sos-button" @onclick="ActivarSOS">
+        <button class="sos-button" @onclick="ActivarSOS" disabled="@procesando">
             <div class="sos-inner">
                 <span>SOS</span>
             </div>
             <div class="ripple"></div>
         </button>
+
         <p class="sos-text">Presiona para asistencia inmediata</p>
+
+        @if (!string.IsNullOrEmpty(mensajeEstado))
+        {
+            <p class="text-white text-center mt-2">@mensajeEstado</p>
+        }
     </div>
+
 
     <div class="quick-contacts animate-enter" style="animation-delay: 0.2s">
         <button class="contact-pill" @onclick="Llamar911">
@@ -35,9 +43,43 @@
     </div>
 </div>
 
+
 @code {
-    private void ActivarSOS() { /* SOS Logic */ }
-    private void Llamar911() { /* Call Logic */ }
-    private void LlamarSoporte() { /* Call Logic */ }
-    private void AbrirWhatsapp() { /* WA Logic */ }
+    private bool procesando = false;
+    private string mensajeEstado = string.Empty;
+
+    private async Task ActivarSOS()
+    {
+        try
+        {
+            procesando = true;
+            mensajeEstado = "Procesando llamada de emergencia...";
+
+            // Número del ejecutivo (PRUEBA OBTENIDO DEL PERFIL)
+            string numeroEjecutivo = "+51933426414";
+
+            var resultado = await TwilioService.MakeEmergencyFlowAsync(numeroEjecutivo);
+
+            if (resultado.IsSuccess)
+            {
+                mensajeEstado = resultado.Data?.Message ?? "Solicitud enviada.";
+            }
+            else
+            {
+                mensajeEstado = $"❌ Error: {resultado.ErrorMessage}";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeEstado = $"❌ Error inesperado: {ex.Message}";
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+
+    private void Llamar911() { }
+    private void LlamarSoporte() { }
+    private void AbrirWhatsapp() { }
 }
